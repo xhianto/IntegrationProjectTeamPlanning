@@ -7,6 +7,9 @@ using RestSharp;
 
 namespace Office365Service
 {
+    /// <summary>
+    /// Class <c> Services </c> handles the generation and refreshing op the OAuth 2.0 security BearerToken
+    /// </summary>
     public class Services
     {
         public Token BearerToken = new Token();
