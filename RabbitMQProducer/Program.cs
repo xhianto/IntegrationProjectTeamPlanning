@@ -64,6 +64,7 @@ namespace RabbitMQProducer
                 autoDelete: false,
                 arguments: null);
             var json = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message));
+            // enter exchange name as first parameter if it exists
             channel.BasicPublish("", queueName, null, json);
         }
     }
