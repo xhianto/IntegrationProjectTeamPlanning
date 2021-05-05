@@ -15,6 +15,7 @@ namespace Office365Service.Models
 
         // Constants of RabbitMQ
         public const string RabbitMQConnectionUrl = "amqp://guest:guest@10.3.17.66:5671";
-        public const string RabbitMQQueueName = "Office365";
+        public const string RabbitMQQueueName = "to-planning_event-queue";
+        public const string RabbitExchangeName = "event-exchange";
     }
 }

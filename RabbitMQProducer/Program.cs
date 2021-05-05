@@ -11,7 +11,6 @@ namespace RabbitMQProducer
 {
     class Program
     {
-        // testcomment
         private static string email = "docent@ipwt3.onmicrosoft.com";
         private static string uuid = "";
         private static Services OfficeService = new Services();
@@ -19,6 +18,7 @@ namespace RabbitMQProducer
 
         static void Main(string[] args)
         {
+            GetUUIDFromEmail(email);
             List<OfficeCalendar> events = new List<OfficeCalendar>();
             Console.WriteLine(BearerToken.Access_token);
 
@@ -51,7 +51,6 @@ namespace RabbitMQProducer
             }
 
             Uri rabbitMQUri = new Uri(Constant.RabbitMQConnectionUrl);
-            string queueName = Constant.RabbitMQQueueName;
             var message = events;
 
             var factory = new ConnectionFactory
@@ -61,17 +60,17 @@ namespace RabbitMQProducer
             using var connection = factory.CreateConnection();
             using var channel = connection.CreateModel();
             channel.QueueDeclare(
-                queueName,
+                "",
                 durable: true,
                 exclusive: false,
                 autoDelete: false,
                 arguments: null);
             //dit alleen even veranderen in een xml
             var json = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message));
-            channel.BasicPublish("wt3.event-exchange","to-canvas_event-queue", null, json);
-            channel.BasicPublish("wt3.event-exchange", "to-frontend_event-queue", null, json);
-            channel.BasicPublish("wt3.event-exchange", "Queue to-monitoring_event - queue", null, json);
-            
+            channel.BasicPublish(Constant.RabbitExchangeName,"", null, json);   //to-canvas_event-queue
+                                                                         //  channel.BasicPublish("wt3.event-exchange", "to-frontend_event-queue", null, json);
+                                                                         //  channel.BasicPublish("wt3.event-exchange", "to-monitoring_event-queue", null, json);
+
         }
 
         public static void GetUUIDFromEmail(string email)
