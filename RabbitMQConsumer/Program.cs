@@ -59,7 +59,7 @@ namespace RabbitMQConsumer
                 using (TextReader reader = new StringReader(xml))
                 {
                     RabbitMQEvent result = (RabbitMQEvent)serializer.Deserialize(reader);
-                    result.uuid = "e768646c-eaf9-4f82-99ce-0a49736deef7";
+                    //result.uuid = "e768646c-eaf9-4f82-99ce-0a49736deef7";
                     Console.WriteLine(result.header.method);
                     Console.WriteLine(result.uuid);
                     Console.WriteLine(result.entityVersion);
@@ -69,7 +69,7 @@ namespace RabbitMQConsumer
                     Console.WriteLine(result.start);
                     Console.WriteLine(result.end);
 
-                    if (result.header.method.ToLower() == "post")
+                    if (result.header.method.ToLower() == "create")
                     {
                         Post(result);
                     }
@@ -85,16 +85,17 @@ namespace RabbitMQConsumer
             string email = "";
             RestClient restClient = new RestClient();
             RestRequest restRequest = new RestRequest();
+            BearerToken = OfficeService.RefreshAccesToken();
 
             restRequest.AddHeader("Authorization", BearerToken.Token_type + " " + BearerToken.Access_token);
             restRequest.AddHeader("Prefer", "outlook.timezone=\"Romance Standard Time\"");
             restRequest.AddHeader("Prefer", "outlook.body-content-type=\"text\"");
 
-            restClient.BaseUrl = new Uri($"https://graph.microsoft.com/v1.0/users/{email}");
+            restClient.BaseUrl = new Uri($"https://graph.microsoft.com/v1.0/users/{uuid}");
             var response = restClient.Get(restRequest);
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
-                Console.WriteLine(response.Content);
+                //Console.WriteLine(response.Content);
                 User user = JsonConvert.DeserializeObject<User>(response.Content);
                 email = user.UserPrincipalName;
             }
@@ -117,6 +118,7 @@ namespace RabbitMQConsumer
             calendarEvent.Organizer = new Organizer();
             calendarEvent.Organizer.EmailAddress = new EmailAddress();
             calendarEvent.Organizer.EmailAddress.Address = GetEmailFromUUID(rabbitMQEvent.organiserId);
+            BearerToken = OfficeService.RefreshAccesToken();
 
             var json = JsonConvert.SerializeObject(calendarEvent);
             restRequest.AddHeader("Authorization", BearerToken.Token_type + " " + BearerToken.Access_token);
@@ -125,7 +127,7 @@ namespace RabbitMQConsumer
             //restRequest.AddHeader("Prefer", "outlook.timezone=\"Romance Standard Time\"");
             //restRequest.AddHeader("Prefer", "outlook.body-content-type=\"text\"");
 
-            restClient.BaseUrl = new Uri($"https://graph.microsoft.com/v1.0/users/{rabbitMQEvent.uuid}/events");
+            restClient.BaseUrl = new Uri($"https://graph.microsoft.com/v1.0/users/{rabbitMQEvent.organiserId}/events");
             var response = restClient.Post(restRequest);
 
             Console.WriteLine(response.StatusCode);

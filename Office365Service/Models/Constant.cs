@@ -14,7 +14,8 @@ namespace Office365Service.Models
         public const string Tenant_Id = "e0f82523-278e-4994-878e-5b879b05c241";
 
         // Constants of RabbitMQ
-        public const string RabbitMQConnectionUrl = "amqp://guest:guest@10.3.17.66:5671";
+        //public const string RabbitMQConnectionUrl = "amqp://guest:guest@10.3.17.66:5671";
+        public const string RabbitMQConnectionUrl = "amqp://guest:guest@10.3.17.61:5672";
         public const string RabbitMQQueueName = "to-planning_event-queue";
         public const string RabbitExchangeName = "event-exchange";
     }
