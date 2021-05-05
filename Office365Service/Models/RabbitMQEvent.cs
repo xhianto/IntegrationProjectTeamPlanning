@@ -5,9 +5,10 @@ using System.Xml.Serialization;
 
 namespace Office365Service.Models
 {
-    [Serializable, XmlRoot(ElementName = "Event")]
+    [Serializable, XmlRoot(ElementName = "event")]
     public class RabbitMQEvent
     {
+        public Header header { get; set; }
         public string uuid { get; set; }
         public string entityVersion { get; set; }
         public string title { get; set; }

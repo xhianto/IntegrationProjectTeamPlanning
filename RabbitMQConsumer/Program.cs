@@ -60,6 +60,7 @@ namespace RabbitMQConsumer
                 {
                     RabbitMQEvent result = (RabbitMQEvent)serializer.Deserialize(reader);
                     result.uuid = "e768646c-eaf9-4f82-99ce-0a49736deef7";
+                    Console.WriteLine(result.header.method);
                     Console.WriteLine(result.uuid);
                     Console.WriteLine(result.entityVersion);
                     Console.WriteLine(result.title);
@@ -68,38 +69,66 @@ namespace RabbitMQConsumer
                     Console.WriteLine(result.start);
                     Console.WriteLine(result.end);
 
-                    RestClient restClient = new RestClient();
-                    RestRequest restRequest = new RestRequest();
-
-                    CalendarEvent calendarEvent = new CalendarEvent();
-                    calendarEvent.Subject = result.title;
-                    calendarEvent.Start = new Office365Service.Models.TimeZone();
-                    calendarEvent.Start.DateTime = DateTime.ParseExact(result.start, "dd/MM/yyyy H:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
-                    calendarEvent.Start.Zone = "Romance Standard Time";
-                    calendarEvent.End = new Office365Service.Models.TimeZone();
-                    calendarEvent.End.DateTime = DateTime.ParseExact(result.end, "dd/MM/yyyy H:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
-                    calendarEvent.End.Zone = "Romance Standard Time";
-                    calendarEvent.BodyPreview = result.description;
-                    calendarEvent.Organizer = new Organizer();
-                    calendarEvent.Organizer.EmailAddress = new EmailAddress();
-                    calendarEvent.Organizer.EmailAddress.Address = result.organiserId;
-
-                    var json = JsonConvert.SerializeObject(calendarEvent);
-                    restRequest.AddHeader("Authorization", BearerToken.Token_type + " " + BearerToken.Access_token);
-                    restRequest.AddJsonBody(json);
-                    Console.WriteLine(json);
-                    //restRequest.AddHeader("Prefer", "outlook.timezone=\"Romance Standard Time\"");
-                    //restRequest.AddHeader("Prefer", "outlook.body-content-type=\"text\"");
-
-                    restClient.BaseUrl = new Uri($"https://graph.microsoft.com/v1.0/users/{result.uuid}/events");
-                    var response = restClient.Post(restRequest);
-
-                    Console.WriteLine(response.StatusCode);
+                    if (result.header.method.ToLower() == "post")
+                    {
+                        Post(result);
+                    }
                 }
             };
 
             channel.BasicConsume(queueName, true, consumer);
             Console.ReadLine();
+        }
+
+        private static string GetEmailFromUUID(string uuid)
+        {
+            string email = "";
+            RestClient restClient = new RestClient();
+            RestRequest restRequest = new RestRequest();
+
+            restRequest.AddHeader("Authorization", BearerToken.Token_type + " " + BearerToken.Access_token);
+            restRequest.AddHeader("Prefer", "outlook.timezone=\"Romance Standard Time\"");
+            restRequest.AddHeader("Prefer", "outlook.body-content-type=\"text\"");
+
+            restClient.BaseUrl = new Uri($"https://graph.microsoft.com/v1.0/users/{email}");
+            var response = restClient.Get(restRequest);
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                Console.WriteLine(response.Content);
+                User user = JsonConvert.DeserializeObject<User>(response.Content);
+                email = user.UserPrincipalName;
+            }
+            return email;
+        }
+
+        private static void Post(RabbitMQEvent rabbitMQEvent){
+            RestClient restClient = new RestClient();
+            RestRequest restRequest = new RestRequest();
+
+            CalendarEvent calendarEvent = new CalendarEvent();
+            calendarEvent.Subject = rabbitMQEvent.title;
+            calendarEvent.Start = new Office365Service.Models.TimeZone();
+            calendarEvent.Start.DateTime = DateTime.ParseExact(rabbitMQEvent.start, "dd/MM/yyyy H:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+            calendarEvent.Start.Zone = "Romance Standard Time";
+            calendarEvent.End = new Office365Service.Models.TimeZone();
+            calendarEvent.End.DateTime = DateTime.ParseExact(rabbitMQEvent.end, "dd/MM/yyyy H:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+            calendarEvent.End.Zone = "Romance Standard Time";
+            calendarEvent.BodyPreview = rabbitMQEvent.description;
+            calendarEvent.Organizer = new Organizer();
+            calendarEvent.Organizer.EmailAddress = new EmailAddress();
+            calendarEvent.Organizer.EmailAddress.Address = GetEmailFromUUID(rabbitMQEvent.organiserId);
+
+            var json = JsonConvert.SerializeObject(calendarEvent);
+            restRequest.AddHeader("Authorization", BearerToken.Token_type + " " + BearerToken.Access_token);
+            restRequest.AddJsonBody(json);
+            Console.WriteLine(json);
+            //restRequest.AddHeader("Prefer", "outlook.timezone=\"Romance Standard Time\"");
+            //restRequest.AddHeader("Prefer", "outlook.body-content-type=\"text\"");
+
+            restClient.BaseUrl = new Uri($"https://graph.microsoft.com/v1.0/users/{rabbitMQEvent.uuid}/events");
+            var response = restClient.Post(restRequest);
+
+            Console.WriteLine(response.StatusCode);
         }
     }
 }

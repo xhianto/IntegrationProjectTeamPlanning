@@ -20,7 +20,7 @@ namespace RabbitMQProducer
 
         static void Main(string[] args)
         {
-            GetUUIDFromEmail(email);
+            uuid = GetUUIDFromEmail(email);
             List<CalendarEvent> events = new List<CalendarEvent>();
             Console.WriteLine(BearerToken.Access_token);
 
@@ -79,10 +79,11 @@ namespace RabbitMQProducer
             }
         }
 
-        public static void GetUUIDFromEmail(string email)
+        public static string GetUUIDFromEmail(string email)
         {
             RestClient restClient = new RestClient();
             RestRequest restRequest = new RestRequest();
+            string useruuid = "";
 
             restRequest.AddHeader("Authorization", BearerToken.Token_type + " " + BearerToken.Access_token);
             restRequest.AddHeader("Prefer", "outlook.timezone=\"Romance Standard Time\"");
@@ -94,8 +95,9 @@ namespace RabbitMQProducer
             {
                 Console.WriteLine(response.Content);
                 User user = JsonConvert.DeserializeObject<User>(response.Content);
-                uuid = user.Id;
+                useruuid = user.Id;
             }
+            return useruuid;
         }
         public static string ConvertToXml(CalendarEvent calendarEvent)
         {
@@ -110,14 +112,17 @@ namespace RabbitMQProducer
                     // Build Xml with xw.
 
                     writer.WriteStartDocument();
-                    writer.WriteStartElement("Event");
+                    writer.WriteStartElement("event");
                     writer.WriteAttributeString("xsi", "noNamespaceSchemaLocation", null, "event.xsd");
                     writer.WriteAttributeString("xmlns", "xsi", null, "http://www.w3.org/2001/XMLSchema-instance");
+                    writer.WriteStartElement("header");
+                    writer.WriteElementString("method", "post"); //nog hardcoded voor post
+                    writer.WriteEndElement();
                     writer.WriteElementString("uuid", uuid);
                     writer.WriteElementString("entityVersion", "15");
                     writer.WriteElementString("title", calendarEvent.Subject);
                     //Naam of email van organiser
-                    writer.WriteElementString("organiserId", calendarEvent.Organizer.EmailAddress.Address);
+                    writer.WriteElementString("organiserId", GetUUIDFromEmail(calendarEvent.Organizer.EmailAddress.Address));
                     writer.WriteElementString("description", calendarEvent.BodyPreview);
                     writer.WriteElementString("start", calendarEvent.Start.DateTime.ToString());
                     writer.WriteElementString("end", calendarEvent.End.DateTime.ToString());
