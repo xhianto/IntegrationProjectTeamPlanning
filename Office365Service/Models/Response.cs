@@ -6,6 +6,6 @@ namespace Office365Service.Models
 {
     public class Response
     {
-        public List<OfficeCalendar> Value { get; set; }  
+        public List<CalendarEvent> Value { get; set; }  
     }
 }

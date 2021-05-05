@@ -3,16 +3,22 @@ using RabbitMQ.Client;
 using System.Text;
 using RabbitMQ.Client.Events;
 using Office365Service.Models;
+using Office365Service;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using System.Xml.Serialization;
+using System.IO;
+using RestSharp;
 
 namespace RabbitMQConsumer
 {
     class Program
     {
+        private static Services OfficeService = new Services();
+        private static Token BearerToken = OfficeService.RefreshAccesToken();
         static void Main(string[] args)
         {
-            List<OfficeCalendar> events = new List<OfficeCalendar>();
+            List<CalendarEvent> events = new List<CalendarEvent>();
             Uri rabbitMQUri = new Uri(Constant.RabbitMQConnectionUrl);
             string queueName = Constant.RabbitMQQueueName;
 
@@ -33,17 +39,62 @@ namespace RabbitMQConsumer
             consumer.Received += (sender, e) =>
             {
                 var message = e.Body.ToArray();
-                var json = Encoding.UTF8.GetString(message);
-                Console.WriteLine(json);
-                events = JsonConvert.DeserializeObject<List<OfficeCalendar>>(json);
-                foreach (var ev in events)
+                var xml = Encoding.UTF8.GetString(message);
+                Console.WriteLine(xml);
+                //events = JsonConvert.DeserializeObject<List<CalendarEvent>>(xml);
+                //foreach (var ev in events)
+                //{
+                //    Console.WriteLine(ev.Email);
+                //    Console.WriteLine(ev.Subject);
+                //    Console.WriteLine(ev.Start.DateTime);
+                //    Console.WriteLine(ev.Start.Zone);
+                //    Console.WriteLine(ev.End.DateTime);
+                //    Console.WriteLine(ev.End.Zone);
+                //}
+                //int hulp = xml.IndexOf("<", 1, xml.Length-1);
+                //Console.WriteLine(hulp);
+                XmlSerializer serializer = new XmlSerializer(typeof(RabbitMQEvent));
+                //xml = xml.Substring(hulp);
+                Console.WriteLine(xml);
+                using (TextReader reader = new StringReader(xml))
                 {
-                    Console.WriteLine(ev.Email);
-                    Console.WriteLine(ev.Subject);
-                    Console.WriteLine(ev.Start.DateTime);
-                    Console.WriteLine(ev.Start.Zone);
-                    Console.WriteLine(ev.End.DateTime);
-                    Console.WriteLine(ev.End.Zone);
+                    RabbitMQEvent result = (RabbitMQEvent)serializer.Deserialize(reader);
+                    result.uuid = "e768646c-eaf9-4f82-99ce-0a49736deef7";
+                    Console.WriteLine(result.uuid);
+                    Console.WriteLine(result.entityVersion);
+                    Console.WriteLine(result.title);
+                    Console.WriteLine(result.organiserId);
+                    Console.WriteLine(result.description);
+                    Console.WriteLine(result.start);
+                    Console.WriteLine(result.end);
+
+                    RestClient restClient = new RestClient();
+                    RestRequest restRequest = new RestRequest();
+
+                    CalendarEvent calendarEvent = new CalendarEvent();
+                    calendarEvent.Subject = result.title;
+                    calendarEvent.Start = new Office365Service.Models.TimeZone();
+                    calendarEvent.Start.DateTime = DateTime.ParseExact(result.start, "dd/MM/yyyy H:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+                    calendarEvent.Start.Zone = "Romance Standard Time";
+                    calendarEvent.End = new Office365Service.Models.TimeZone();
+                    calendarEvent.End.DateTime = DateTime.ParseExact(result.end, "dd/MM/yyyy H:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+                    calendarEvent.End.Zone = "Romance Standard Time";
+                    calendarEvent.BodyPreview = result.description;
+                    calendarEvent.Organizer = new Organizer();
+                    calendarEvent.Organizer.EmailAddress = new EmailAddress();
+                    calendarEvent.Organizer.EmailAddress.Address = result.organiserId;
+
+                    var json = JsonConvert.SerializeObject(calendarEvent);
+                    restRequest.AddHeader("Authorization", BearerToken.Token_type + " " + BearerToken.Access_token);
+                    restRequest.AddJsonBody(json);
+                    Console.WriteLine(json);
+                    //restRequest.AddHeader("Prefer", "outlook.timezone=\"Romance Standard Time\"");
+                    //restRequest.AddHeader("Prefer", "outlook.body-content-type=\"text\"");
+
+                    restClient.BaseUrl = new Uri($"https://graph.microsoft.com/v1.0/users/{result.uuid}/events");
+                    var response = restClient.Post(restRequest);
+
+                    Console.WriteLine(response.StatusCode);
                 }
             };
 
