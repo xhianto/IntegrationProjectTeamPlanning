@@ -41,9 +41,9 @@ namespace RabbitMQConsumer
                     Console.WriteLine(ev.Email);
                     Console.WriteLine(ev.Subject);
                     Console.WriteLine(ev.Start.DateTime);
-                    Console.WriteLine(ev.Start.TimeZone);
+                    Console.WriteLine(ev.Start.Zone);
                     Console.WriteLine(ev.End.DateTime);
-                    Console.WriteLine(ev.End.TimeZone);
+                    Console.WriteLine(ev.End.Zone);
                 }
             };
 

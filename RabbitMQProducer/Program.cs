@@ -45,9 +45,9 @@ namespace RabbitMQProducer
                 Console.WriteLine(e.Email);
                 Console.WriteLine(e.Subject);
                 Console.WriteLine(e.Start.DateTime);
-                Console.WriteLine(e.Start.TimeZone);
+                Console.WriteLine(e.Start.Zone);
                 Console.WriteLine(e.End.DateTime);
-                Console.WriteLine(e.End.TimeZone);
+                Console.WriteLine(e.End.Zone);
             }
 
             Uri rabbitMQUri = new Uri(Constant.RabbitMQConnectionUrl);
@@ -68,7 +68,10 @@ namespace RabbitMQProducer
                 arguments: null);
             //dit alleen even veranderen in een xml
             var json = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message));
-            channel.BasicPublish("", queueName, null, json);
+            channel.BasicPublish("wt3.event-exchange","to-canvas_event-queue", null, json);
+            channel.BasicPublish("wt3.event-exchange", "to-frontend_event-queue", null, json);
+            channel.BasicPublish("wt3.event-exchange", "Queue to-monitoring_event - queue", null, json);
+            
         }
 
         public static void GetUUIDFromEmail(string email)
