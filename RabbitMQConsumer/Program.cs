@@ -71,7 +71,7 @@ namespace RabbitMQConsumer
 
                     if (result.header.method.ToLower() == "create")
                     {
-                        Post(result);
+                        OfficeService.Post(result);
                     }
                 }
             };
@@ -80,57 +80,8 @@ namespace RabbitMQConsumer
             Console.ReadLine();
         }
 
-        private static string GetEmailFromUUID(string uuid)
-        {
-            string email = "";
-            RestClient restClient = new RestClient();
-            RestRequest restRequest = new RestRequest();
-            BearerToken = OfficeService.RefreshAccesToken();
+        
 
-            restRequest.AddHeader("Authorization", BearerToken.Token_type + " " + BearerToken.Access_token);
-            restRequest.AddHeader("Prefer", "outlook.timezone=\"Romance Standard Time\"");
-            restRequest.AddHeader("Prefer", "outlook.body-content-type=\"text\"");
-
-            restClient.BaseUrl = new Uri($"https://graph.microsoft.com/v1.0/users/{uuid}");
-            var response = restClient.Get(restRequest);
-            if (response.StatusCode == System.Net.HttpStatusCode.OK)
-            {
-                //Console.WriteLine(response.Content);
-                User user = JsonConvert.DeserializeObject<User>(response.Content);
-                email = user.UserPrincipalName;
-            }
-            return email;
-        }
-
-        private static void Post(RabbitMQEvent rabbitMQEvent){
-            RestClient restClient = new RestClient();
-            RestRequest restRequest = new RestRequest();
-
-            CalendarEvent calendarEvent = new CalendarEvent();
-            calendarEvent.Subject = rabbitMQEvent.title;
-            calendarEvent.Start = new Office365Service.Models.TimeZone();
-            calendarEvent.Start.DateTime = DateTime.ParseExact(rabbitMQEvent.start, "dd/MM/yyyy H:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
-            calendarEvent.Start.Zone = "Romance Standard Time";
-            calendarEvent.End = new Office365Service.Models.TimeZone();
-            calendarEvent.End.DateTime = DateTime.ParseExact(rabbitMQEvent.end, "dd/MM/yyyy H:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
-            calendarEvent.End.Zone = "Romance Standard Time";
-            calendarEvent.BodyPreview = rabbitMQEvent.description;
-            calendarEvent.Organizer = new Organizer();
-            calendarEvent.Organizer.EmailAddress = new EmailAddress();
-            calendarEvent.Organizer.EmailAddress.Address = GetEmailFromUUID(rabbitMQEvent.organiserId);
-            BearerToken = OfficeService.RefreshAccesToken();
-
-            var json = JsonConvert.SerializeObject(calendarEvent);
-            restRequest.AddHeader("Authorization", BearerToken.Token_type + " " + BearerToken.Access_token);
-            restRequest.AddJsonBody(json);
-            Console.WriteLine(json);
-            //restRequest.AddHeader("Prefer", "outlook.timezone=\"Romance Standard Time\"");
-            //restRequest.AddHeader("Prefer", "outlook.body-content-type=\"text\"");
-
-            restClient.BaseUrl = new Uri($"https://graph.microsoft.com/v1.0/users/{rabbitMQEvent.organiserId}/events");
-            var response = restClient.Post(restRequest);
-
-            Console.WriteLine(response.StatusCode);
-        }
+       
     }
 }
