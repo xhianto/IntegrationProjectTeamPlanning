@@ -6,7 +6,7 @@ namespace Office365Service.Models
 {
     public class TimeZone
     {
-        public DateTime dateTime { get; set; }
-        public string timeZone { get; set; }
+        public DateTime DateTime { get; set; }
+        public string TimeZone { get; set; }
     }
 }

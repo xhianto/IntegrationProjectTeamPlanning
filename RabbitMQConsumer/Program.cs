@@ -38,12 +38,12 @@ namespace RabbitMQConsumer
                 events = JsonConvert.DeserializeObject<List<OfficeCalendar>>(json);
                 foreach (var ev in events)
                 {
-                    Console.WriteLine(ev.email);
-                    Console.WriteLine(ev.subject);
-                    Console.WriteLine(ev.start.dateTime);
-                    Console.WriteLine(ev.start.timeZone);
-                    Console.WriteLine(ev.end.dateTime);
-                    Console.WriteLine(ev.end.timeZone);
+                    Console.WriteLine(ev.Email);
+                    Console.WriteLine(ev.Subject);
+                    Console.WriteLine(ev.Start.DateTime);
+                    Console.WriteLine(ev.Start.TimeZone);
+                    Console.WriteLine(ev.End.DateTime);
+                    Console.WriteLine(ev.End.TimeZone);
                 }
             };
 

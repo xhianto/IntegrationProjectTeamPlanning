@@ -6,9 +6,9 @@ namespace Office365Service.Models
 {
     public class Token
     {
-        public string token_type { get; set; }
-        public int expires_in { get; set; }
-        public int ext_expires_in { get; set; }
-        public string access_token { get; set; }
+        public string Token_type { get; set; }
+        public int Expires_in { get; set; }
+        public int Ext_expires_in { get; set; }
+        public string Access_token { get; set; }
     }
 }

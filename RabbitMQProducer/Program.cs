@@ -11,40 +11,42 @@ namespace RabbitMQProducer
 {
     class Program
     {
+        private static string email = "docent@ipwt3.onmicrosoft.com";
+        private static string uuid = "";
+        private static Services OfficeService = new Services();
+        private static Token BearerToken = OfficeService.RefreshAccesToken();
+
         static void Main(string[] args)
         {
             List<OfficeCalendar> events = new List<OfficeCalendar>();
-            string email = "docent@ipwt3.onmicrosoft.com";
-            Services OfficeService = new Services();
-            Token BearerToken = new Token();
-            BearerToken = OfficeService.RefreshAccesToken();
-            Console.WriteLine(BearerToken.access_token);
+            Console.WriteLine(BearerToken.Access_token);
 
             RestClient restClient = new RestClient();
             RestRequest restRequest = new RestRequest();
 
-            restRequest.AddHeader("Authorization", BearerToken.token_type + " " + BearerToken.access_token);
+            restRequest.AddHeader("Authorization", BearerToken.Token_type + " " + BearerToken.Access_token);
             restRequest.AddHeader("Prefer", "outlook.timezone=\"Romance Standard Time\"");
             restRequest.AddHeader("Prefer", "outlook.body-content-type=\"text\"");
 
-            restClient.BaseUrl = new Uri($"https://graph.microsoft.com/v1.0/users/{email}/calendar/events");
+            restClient.BaseUrl = new Uri($"https://graph.microsoft.com/v1.0/users/{uuid}/calendar/events");
             var response = restClient.Get(restRequest);
 
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
                 Console.WriteLine(response.Content);
                 Response jsonFromGraph = JsonConvert.DeserializeObject<Response>(response.Content);
-                events = jsonFromGraph.value;
+                events = jsonFromGraph.Value;
             }
+            //test
             foreach (var e in events)
             {
-                e.email = email;
-                Console.WriteLine(e.email);
-                Console.WriteLine(e.subject);
-                Console.WriteLine(e.start.dateTime);
-                Console.WriteLine(e.start.timeZone);
-                Console.WriteLine(e.end.dateTime);
-                Console.WriteLine(e.end.timeZone);
+                e.Email = email;
+                Console.WriteLine(e.Email);
+                Console.WriteLine(e.Subject);
+                Console.WriteLine(e.Start.DateTime);
+                Console.WriteLine(e.Start.TimeZone);
+                Console.WriteLine(e.End.DateTime);
+                Console.WriteLine(e.End.TimeZone);
             }
 
             Uri rabbitMQUri = new Uri(Constant.RabbitMQConnectionUrl);
@@ -63,8 +65,28 @@ namespace RabbitMQProducer
                 exclusive: false,
                 autoDelete: false,
                 arguments: null);
+            //dit alleen even veranderen in een xml
             var json = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message));
             channel.BasicPublish("", queueName, null, json);
+        }
+
+        public static void GetUUIDFromEmail(string email)
+        {
+            RestClient restClient = new RestClient();
+            RestRequest restRequest = new RestRequest();
+
+            restRequest.AddHeader("Authorization", BearerToken.Token_type + " " + BearerToken.Access_token);
+            restRequest.AddHeader("Prefer", "outlook.timezone=\"Romance Standard Time\"");
+            restRequest.AddHeader("Prefer", "outlook.body-content-type=\"text\"");
+
+            restClient.BaseUrl = new Uri($"https://graph.microsoft.com/v1.0/users/{email}");
+            var response = restClient.Get(restRequest);
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                Console.WriteLine(response.Content);
+                User user = JsonConvert.DeserializeObject<User>(response.Content);
+                uuid = user.Id;
+            }
         }
     }
 }

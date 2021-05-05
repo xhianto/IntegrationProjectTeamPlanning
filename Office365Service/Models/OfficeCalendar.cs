@@ -6,9 +6,10 @@ namespace Office365Service.Models
 {
     public class OfficeCalendar
     {
-        public string email { get; set; }
-        public string subject { get; set; }
-        public TimeZone start { get; set; }
-        public TimeZone end { get; set; }
+        public string Email { get; set; }
+        public string Subject { get; set; }
+        public TimeZone Start { get; set; }
+        public TimeZone End { get; set; }
+        public Location Location { get; set; }
     }
 }
