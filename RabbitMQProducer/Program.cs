@@ -11,6 +11,7 @@ namespace RabbitMQProducer
 {
     class Program
     {
+        // testcomment
         private static string email = "docent@ipwt3.onmicrosoft.com";
         private static string uuid = "";
         private static Services OfficeService = new Services();
