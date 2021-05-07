@@ -61,6 +61,7 @@ namespace RabbitMQConsumer
                     RabbitMQEvent result = (RabbitMQEvent)serializer.Deserialize(reader);
                     //result.uuid = "e768646c-eaf9-4f82-99ce-0a49736deef7";
                     Console.WriteLine(result.header.method);
+                    Console.WriteLine(result.header.source);
                     Console.WriteLine(result.uuid);
                     Console.WriteLine(result.entityVersion);
                     Console.WriteLine(result.title);
@@ -68,8 +69,9 @@ namespace RabbitMQConsumer
                     Console.WriteLine(result.description);
                     Console.WriteLine(result.start);
                     Console.WriteLine(result.end);
+                    Console.WriteLine(result.location);
 
-                    if (result.header.method.ToLower() == "create")
+                    if (result.header.method.ToLower() == "create" && result.header.source.ToLower() != "planning")
                     {
                         OfficeService.Post(result);
                     }

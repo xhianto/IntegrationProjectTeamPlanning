@@ -94,6 +94,7 @@ namespace Office365Service
                     writer.WriteAttributeString("xmlns", "xsi", null, "http://www.w3.org/2001/XMLSchema-instance");
                     writer.WriteStartElement("header");
                     writer.WriteElementString("method", "create"); //nog hardcoded voor create
+                    writer.WriteElementString("source", "planning");
                     writer.WriteEndElement();
                     writer.WriteElementString("uuid", uuid);
                     writer.WriteElementString("entityVersion", "15");
@@ -103,6 +104,7 @@ namespace Office365Service
                     writer.WriteElementString("description", calendarEvent.BodyPreview);
                     writer.WriteElementString("start", calendarEvent.Start.DateTime.ToString());
                     writer.WriteElementString("end", calendarEvent.End.DateTime.ToString());
+                    writer.WriteElementString("location", calendarEvent.Location.DisplayName);
                     //    writer.WriteStartElement("Location");
                     ////probleempje met cijfer uit straatnaam halen
                     //    Console.WriteLine(calendarEvent.Location.Address.Street);
@@ -155,16 +157,17 @@ namespace Office365Service
 
             CalendarEvent calendarEvent = new CalendarEvent();
             calendarEvent.Subject = rabbitMQEvent.title;
-            calendarEvent.Start = new Office365Service.Models.TimeZone();
+            calendarEvent.Start = new Models.TimeZone();
             calendarEvent.Start.DateTime = DateTime.ParseExact(rabbitMQEvent.start, "dd/MM/yyyy H:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
             calendarEvent.Start.Zone = "Romance Standard Time";
-            calendarEvent.End = new Office365Service.Models.TimeZone();
+            calendarEvent.End = new Models.TimeZone();
             calendarEvent.End.DateTime = DateTime.ParseExact(rabbitMQEvent.end, "dd/MM/yyyy H:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
             calendarEvent.End.Zone = "Romance Standard Time";
             calendarEvent.BodyPreview = rabbitMQEvent.description;
             calendarEvent.Organizer = new Organizer();
             calendarEvent.Organizer.EmailAddress = new EmailAddress();
             calendarEvent.Organizer.EmailAddress.Address = GetEmailFromUUID(rabbitMQEvent.organiserId);
+            calendarEvent.Location.DisplayName = rabbitMQEvent.location;
             BearerToken = RefreshAccesToken();
 
             var json = JsonConvert.SerializeObject(calendarEvent);

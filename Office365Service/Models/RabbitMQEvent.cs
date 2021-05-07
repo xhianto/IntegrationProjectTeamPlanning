@@ -16,7 +16,7 @@ namespace Office365Service.Models
         public string description { get; set; }
         public string start { get; set; }
         public string end { get; set; }
-        public RabbitMQLocation Location { get; set; }
+        public string location { get; set; }
 
     }
 }
