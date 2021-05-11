@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Office365Service.Models
 {
-    public class Address
+    public class CalendarEventLocationAddress
     {
         public string Street { get; set; }
         public string City { get; set; }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Xml;
+using System.Xml.Serialization;
 using Newtonsoft.Json;
 using Office365Service.Models;
 using RestSharp;
@@ -90,21 +91,21 @@ namespace Office365Service
 
                     writer.WriteStartDocument();
                     writer.WriteStartElement("event");
-                    writer.WriteAttributeString("xsi", "noNamespaceSchemaLocation", null, "event.xsd");
+                    writer.WriteAttributeString("xsi", "noNamespaceSchemaLocation", null, "XMLvalidations\\event.xsd");
                     writer.WriteAttributeString("xmlns", "xsi", null, "http://www.w3.org/2001/XMLSchema-instance");
                     writer.WriteStartElement("header");
-                    writer.WriteElementString("method", "create"); //nog hardcoded voor create
-                    writer.WriteElementString("source", "planning");
+                    writer.WriteElementString("method", "CREATE"); //nog hardcoded voor create
+                    writer.WriteElementString("source", "PLANNING");
                     writer.WriteEndElement();
                     writer.WriteElementString("uuid", uuid);
                     writer.WriteElementString("entityVersion", "15");
                     writer.WriteElementString("title", calendarEvent.Subject);
                     //Naam of email van organiser
                     writer.WriteElementString("organiserId", GetUUIDFromEmail(calendarEvent.Organizer.EmailAddress.Address));
-                    writer.WriteElementString("description", calendarEvent.BodyPreview);
-                    writer.WriteElementString("start", calendarEvent.Start.DateTime.ToString());
-                    writer.WriteElementString("end", calendarEvent.End.DateTime.ToString());
-                    writer.WriteElementString("location", calendarEvent.Location.DisplayName);
+                    writer.WriteElementString("description", "description");
+                    writer.WriteElementString("start", "2021-01-01T01:01:00"); //calendarEvent.Start.DateTime.ToString());
+                    writer.WriteElementString("end", "2021-01-01T02:01:00"); //calendarEvent.End.DateTime.ToString());
+                    writer.WriteElementString("location", "straat 48 1000 stad");
                     //    writer.WriteStartElement("Location");
                     ////probleempje met cijfer uit straatnaam halen
                     //    Console.WriteLine(calendarEvent.Location.Address.Street);
@@ -150,24 +151,64 @@ namespace Office365Service
                 return sw.ToString();
             }
         }
+
+        public string ConvertObjectToXML(CalendarEvent calendarEvent, string uuid)
+        {
+            string xml = "";
+            RabbitMQEvent rabbitMQEvent = new RabbitMQEvent();
+            rabbitMQEvent.Header = new RabbitMQHeader();
+            rabbitMQEvent.Header.Method = "CREATE";
+            rabbitMQEvent.Header.Source = "PLANNING";
+            rabbitMQEvent.UUID = new Guid(uuid);
+            rabbitMQEvent.EntityVersion = 1;
+            rabbitMQEvent.Title = calendarEvent.Subject;
+            rabbitMQEvent.OrganiserId = new Guid(uuid);
+            rabbitMQEvent.Description = "Komt dit door?";
+            rabbitMQEvent.Start = calendarEvent.Start.DateTime;
+            rabbitMQEvent.End = calendarEvent.End.DateTime;
+            rabbitMQEvent.Location = "straat 48 1000 stad";
+            try
+            {
+                MemoryStream mStream = new MemoryStream();
+                XmlSerializer serializer = new XmlSerializer(typeof(RabbitMQEvent));
+                XmlTextWriter writer = new XmlTextWriter(mStream, Encoding.UTF8);
+                writer.Formatting = System.Xml.Formatting.Indented;
+                serializer.Serialize(writer, rabbitMQEvent);
+                xml = Encoding.UTF8.GetString(mStream.ToArray()).Substring(1);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            return xml;
+        }
         public void Post(RabbitMQEvent rabbitMQEvent)
         {
             RestClient restClient = new RestClient();
             RestRequest restRequest = new RestRequest();
 
             CalendarEvent calendarEvent = new CalendarEvent();
-            calendarEvent.Subject = rabbitMQEvent.title;
-            calendarEvent.Start = new Models.TimeZone();
-            calendarEvent.Start.DateTime = DateTime.ParseExact(rabbitMQEvent.start, "dd/MM/yyyy H:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+            calendarEvent.Subject = rabbitMQEvent.Title;
+            calendarEvent.Start = new Models.CalendarEventTimeZone();
+            if (rabbitMQEvent.Header.Source.ToLower() != "canvas")
+                calendarEvent.Start.DateTime = DateTime.Parse(rabbitMQEvent.Start.ToString());
+            else
+                calendarEvent.Start.DateTime = DateTime.ParseExact(rabbitMQEvent.Start.ToString(), "d/MM/yyyy H:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
             calendarEvent.Start.Zone = "Romance Standard Time";
-            calendarEvent.End = new Models.TimeZone();
-            calendarEvent.End.DateTime = DateTime.ParseExact(rabbitMQEvent.end, "dd/MM/yyyy H:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+            calendarEvent.End = new Models.CalendarEventTimeZone();
+            if (rabbitMQEvent.Header.Source.ToLower() != "canvas")
+                calendarEvent.End.DateTime = DateTime.Parse(rabbitMQEvent.End.ToString());
+            else
+                calendarEvent.End.DateTime = DateTime.ParseExact(rabbitMQEvent.End.ToString(), "d/MM/yyyy H:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
             calendarEvent.End.Zone = "Romance Standard Time";
-            calendarEvent.BodyPreview = rabbitMQEvent.description;
-            calendarEvent.Organizer = new Organizer();
-            calendarEvent.Organizer.EmailAddress = new EmailAddress();
-            calendarEvent.Organizer.EmailAddress.Address = GetEmailFromUUID(rabbitMQEvent.organiserId);
-            calendarEvent.Location.DisplayName = rabbitMQEvent.location;
+            //calendarEvent.BodyPreview = rabbitMQEvent.Description;
+            calendarEvent.Body = new CalendarEventBody();
+            calendarEvent.Body.ContentType = "text";
+            calendarEvent.Body.Content = rabbitMQEvent.Description;
+            calendarEvent.Organizer = new CalendarEventOrganizer();
+            calendarEvent.Organizer.EmailAddress = new CalendarEventEmailAddress();
+            calendarEvent.Organizer.EmailAddress.Address = rabbitMQEvent.OrganiserId.ToString();
+            //calendarEvent.Location.DisplayName = rabbitMQEvent.location;
             BearerToken = RefreshAccesToken();
 
             var json = JsonConvert.SerializeObject(calendarEvent);
@@ -177,7 +218,7 @@ namespace Office365Service
             //restRequest.AddHeader("Prefer", "outlook.timezone=\"Romance Standard Time\"");
             //restRequest.AddHeader("Prefer", "outlook.body-content-type=\"text\"");
 
-            restClient.BaseUrl = new Uri($"https://graph.microsoft.com/v1.0/users/{rabbitMQEvent.organiserId}/events");
+            restClient.BaseUrl = new Uri($"https://graph.microsoft.com/v1.0/users/{rabbitMQEvent.OrganiserId}/events");
             var response = restClient.Post(restRequest);
 
             Console.WriteLine(response.StatusCode);

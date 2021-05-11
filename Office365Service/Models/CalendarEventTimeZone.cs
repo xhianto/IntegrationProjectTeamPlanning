@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 namespace Office365Service.Models
 {
-    public class TimeZone
+    public class CalendarEventTimeZone
     {
         [JsonProperty("dateTime")]
         public DateTime DateTime { get; set; }

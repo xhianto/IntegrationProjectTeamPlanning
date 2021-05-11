@@ -10,14 +10,16 @@ namespace Office365Service.Models
         [JsonProperty("subject")]
         public string Subject { get; set; }
         [JsonProperty("start")]
-        public TimeZone Start { get; set; }
+        public CalendarEventTimeZone Start { get; set; }
         [JsonProperty("end")]
-        public TimeZone End { get; set; }
+        public CalendarEventTimeZone End { get; set; }
+        [JsonProperty("body")]
+        public CalendarEventBody Body { get; set; }
         [JsonProperty("location")]
-        public Location Location { get; set; }
+        public CalendarEventLocation Location { get; set; }
         [JsonProperty("organizer")]
-        public Organizer Organizer { get; set; }
-        [JsonProperty("bodyPreview")]
-        public string BodyPreview { get; set; }
+        public CalendarEventOrganizer Organizer { get; set; }
+        //[JsonProperty("bodyPreview")]
+        //public string BodyPreview { get; set; }
     }
 }

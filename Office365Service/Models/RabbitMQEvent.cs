@@ -8,15 +8,24 @@ namespace Office365Service.Models
     [Serializable, XmlRoot(ElementName = "event")]
     public class RabbitMQEvent
     {
-        public Header header { get; set; }
-        public string uuid { get; set; }
-        public string entityVersion { get; set; }
-        public string title { get; set; }
-        public string organiserId { get; set; }
-        public string description { get; set; }
-        public string start { get; set; }
-        public string end { get; set; }
-        public string location { get; set; }
+        [XmlElement("header")]
+        public RabbitMQHeader Header { get; set; }
+        [XmlElement("uuid")]
+        public Guid UUID { get; set; }
+        [XmlElement("entityVersion")]
+        public int EntityVersion { get; set; }
+        [XmlElement("title")]
+        public string Title { get; set; }
+        [XmlElement("organiserId")]
+        public Guid OrganiserId { get; set; }
+        [XmlElement("description")]
+        public string Description { get; set; }
+        [XmlElement("start")]
+        public DateTime Start { get; set; }
+        [XmlElement("end")]
+        public DateTime End { get; set; }
+        [XmlElement("location")]
+        public string Location { get; set; }
 
     }
 }

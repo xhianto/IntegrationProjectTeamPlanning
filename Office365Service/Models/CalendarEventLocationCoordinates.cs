@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Office365Service.Models
 {
-    public class Coordinates
+    public class CalendarEventLocationCoordinates
     {
         public float Latitude { get; set; }
         public float Longitude { get; set; }

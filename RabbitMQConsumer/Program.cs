@@ -55,23 +55,29 @@ namespace RabbitMQConsumer
                 //Console.WriteLine(hulp);
                 XmlSerializer serializer = new XmlSerializer(typeof(RabbitMQEvent));
                 //xml = xml.Substring(hulp);
+                //if (xml.)
+                //if (xml.IndexOf("?", 0, 1) == 0)
+                //    xml = xml.Substring(1);
                 Console.WriteLine(xml);
+                //string _byteOrderMarkUtf8 = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble());
+                //if (xml.StartsWith(_byteOrderMarkUtf8))
+                //    xml = xml.Remove(0, _byteOrderMarkUtf8.Length);
                 using (TextReader reader = new StringReader(xml))
                 {
                     RabbitMQEvent result = (RabbitMQEvent)serializer.Deserialize(reader);
                     //result.uuid = "e768646c-eaf9-4f82-99ce-0a49736deef7";
-                    Console.WriteLine(result.header.method);
-                    Console.WriteLine(result.header.source);
-                    Console.WriteLine(result.uuid);
-                    Console.WriteLine(result.entityVersion);
-                    Console.WriteLine(result.title);
-                    Console.WriteLine(result.organiserId);
-                    Console.WriteLine(result.description);
-                    Console.WriteLine(result.start);
-                    Console.WriteLine(result.end);
-                    Console.WriteLine(result.location);
+                    Console.WriteLine(result.Header.Method);
+                    Console.WriteLine(result.Header.Source);
+                    Console.WriteLine(result.UUID);
+                    Console.WriteLine(result.EntityVersion);
+                    Console.WriteLine(result.Title);
+                    Console.WriteLine(result.OrganiserId);
+                    Console.WriteLine(result.Description);
+                    Console.WriteLine(result.Start);
+                    Console.WriteLine(result.End);
+                    //Console.WriteLine(result.location);
 
-                    if (result.header.method.ToLower() == "create" && result.header.source.ToLower() != "planning")
+                    if (result.Header.Method.ToLower() == "create" && result.Header.Source.ToLower() == "planning")
                     {
                         OfficeService.Post(result);
                     }

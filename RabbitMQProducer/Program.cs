@@ -13,7 +13,7 @@ namespace RabbitMQProducer
 {
     class Program
     {
-        private static string email = "docent@ipwt3.onmicrosoft.com";
+        private static string email = "nestorw@ipwt3.onmicrosoft.com";
         private static string uuid = "";
         private static Services OfficeService = new Services();
         private static Token BearerToken = OfficeService.RefreshAccesToken();
@@ -70,9 +70,9 @@ namespace RabbitMQProducer
                 //    autoDelete: false,
                 //    arguments: null);
                 //dit alleen even veranderen in een xml
-                string test = OfficeService.ConvertToXml(e, uuid);
-                var xml = Encoding.UTF8.GetBytes(test);
-                Console.WriteLine(test);
+                string xmlString = OfficeService.ConvertObjectToXML(e, uuid);
+                Console.WriteLine(xmlString);
+                var xml = Encoding.UTF8.GetBytes(xmlString);
                 channel.BasicPublish(Constant.RabbitExchangeName,"", null, xml);   //to-canvas_event-queue
                 //  channel.BasicPublish("wt3.event-exchange", "to-frontend_event-queue", null, json);
                 //  channel.BasicPublish("wt3.event-exchange", "to-monitoring_event-queue", null, json);
