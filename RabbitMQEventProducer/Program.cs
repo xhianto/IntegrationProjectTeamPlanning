@@ -73,7 +73,7 @@ namespace RabbitMQProducer
                 string xmlString = OfficeService.ConvertCalendarEventToRabbitMQEvent(e, uuid);
                 Console.WriteLine(xmlString);
                 var xml = Encoding.UTF8.GetBytes(xmlString);
-                channel.BasicPublish(Constant.RabbitMQEventExchangeName,"", null, xml);   //to-canvas_event-queue
+                channel.BasicPublish(Constant.RabbitMQEventExchangeName, "", null, xml);   //to-canvas_event-queue
                 //  channel.BasicPublish("wt3.event-exchange", "to-frontend_event-queue", null, json);
                 //  channel.BasicPublish("wt3.event-exchange", "to-monitoring_event-queue", null, json);
             }

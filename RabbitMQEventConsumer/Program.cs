@@ -87,8 +87,8 @@ namespace RabbitMQConsumer
             Console.ReadLine();
         }
 
-        
 
-       
+
+
     }
 }

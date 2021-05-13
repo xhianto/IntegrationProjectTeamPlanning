@@ -16,7 +16,13 @@ namespace Office365Service.Models
         // Constants of RabbitMQ
         public const string RabbitMQConnectionUrl = "amqp://guest:guest@10.3.17.66:5671";
         //public const string RabbitMQConnectionUrl = "amqp://guest:guest@10.3.17.61:5672";
-        public const string RabbitMQQueueName = "to-planning_event-queue";
-        public const string RabbitExchangeName = "event-exchange";
+        public const string RabbitMQEventExchangeName = "event-exchange";
+        public const string RabbitMQEventQueueName = "to-planning_event-queue";
+        public const string RabbitMQUserExchangeName = "user-exchange";
+        public const string RabbitMQUserQueueName = "to-planning_user-queue";
+        public const string RabbitMQHeartBeatName = "to-monitoring_heartbeat-queue";
+
+        // User
+        public const string StandardPassword = "Test123$"; //of iets dergelijks met user name etc
     }
 }

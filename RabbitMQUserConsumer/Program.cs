@@ -1,25 +1,23 @@
 ﻿using System;
-using RabbitMQ.Client;
-using System.Text;
-using RabbitMQ.Client.Events;
-using Office365Service.Models;
 using Office365Service;
-using System.Collections.Generic;
-using Newtonsoft.Json;
+using Office365Service.Models;
+using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
+using System.Text;
 using System.Xml.Serialization;
 using System.IO;
-using RestSharp;
 
-namespace RabbitMQConsumer
+namespace RabbitMQUserConsumer
 {
     class Program
     {
         private static Services OfficeService = new Services();
+        //bearer token wordt niet refreshed, kan dus geen verbinding meer maken met api na 1 uur
+        //private static Token BearerToken = OfficeService.RefreshAccesToken();
         static void Main(string[] args)
         {
-            List<CalendarEvent> events = new List<CalendarEvent>();
             Uri rabbitMQUri = new Uri(Constant.RabbitMQConnectionUrl);
-            string queueName = Constant.RabbitMQEventQueueName;
+            string queueName = Constant.RabbitMQUserQueueName;
 
             var factory = new ConnectionFactory
             {
@@ -52,33 +50,32 @@ namespace RabbitMQConsumer
                 //}
                 //int hulp = xml.IndexOf("<", 1, xml.Length-1);
                 //Console.WriteLine(hulp);
-                XmlSerializer serializer = new XmlSerializer(typeof(RabbitMQEvent));
+                XmlSerializer serializer = new XmlSerializer(typeof(RabbitMQUser));
                 //xml = xml.Substring(hulp);
                 //if (xml.)
                 //if (xml.IndexOf("?", 0, 1) == 0)
                 //    xml = xml.Substring(1);
-                Console.WriteLine(xml);
+                //Console.WriteLine(xml);
                 //string _byteOrderMarkUtf8 = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble());
                 //if (xml.StartsWith(_byteOrderMarkUtf8))
                 //    xml = xml.Remove(0, _byteOrderMarkUtf8.Length);
                 using (TextReader reader = new StringReader(xml))
                 {
-                    RabbitMQEvent result = (RabbitMQEvent)serializer.Deserialize(reader);
+                    RabbitMQUser result = (RabbitMQUser)serializer.Deserialize(reader);
                     //result.uuid = "e768646c-eaf9-4f82-99ce-0a49736deef7";
                     Console.WriteLine(result.Header.Method);
                     Console.WriteLine(result.Header.Source);
                     Console.WriteLine(result.UUID);
                     Console.WriteLine(result.EntityVersion);
-                    Console.WriteLine(result.Title);
-                    Console.WriteLine(result.OrganiserId);
-                    Console.WriteLine(result.Description);
-                    Console.WriteLine(result.Start);
-                    Console.WriteLine(result.End);
+                    Console.WriteLine(result.LastName);
+                    Console.WriteLine(result.FirstName);
+                    Console.WriteLine(result.EmailAddress);
+                    Console.WriteLine(result.Role);
                     //Console.WriteLine(result.location);
 
                     if (result.Header.Method.ToLower() == "create" && result.Header.Source.ToLower() == "planning")
                     {
-                        OfficeService.Post(result);
+                        OfficeService.UserPost(result);
                     }
                 }
             };
@@ -86,9 +83,5 @@ namespace RabbitMQConsumer
             channel.BasicConsume(queueName, true, consumer);
             Console.ReadLine();
         }
-
-        
-
-       
     }
 }
