@@ -216,8 +216,9 @@ namespace Office365Service
         }
         public void UserPost(RabbitMQUser rabbitMQUser)
         {
+            //Mock data om nieuw user aan te maken
             rabbitMQUser = new RabbitMQUser();
-            rabbitMQUser.FirstName = "Karel";
+            rabbitMQUser.FirstName = "Steve";
             rabbitMQUser.LastName = "Herman";
             rabbitMQUser.Role = "Clown";
 
