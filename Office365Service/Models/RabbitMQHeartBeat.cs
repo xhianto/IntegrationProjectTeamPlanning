@@ -8,6 +8,10 @@ namespace Office365Service.Models
     [Serializable, XmlRoot(ElementName = "heartbeat")]
     public class RabbitMQHeartBeat
     {
+        public RabbitMQHeartBeat()
+        {
+            Header = new RabbitMQHeartBeatHeader();
+        }
         [XmlElement("header")]
         public RabbitMQHeartBeatHeader Header { get; set; }
         [XmlElement("timeStamp")]

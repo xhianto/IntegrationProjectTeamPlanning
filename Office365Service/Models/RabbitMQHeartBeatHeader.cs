@@ -8,8 +8,8 @@ namespace Office365Service.Models
     public class RabbitMQHeartBeatHeader
     {
         [XmlElement("status")]
-        public string Status { get; set; }
+        public XMLStatus Status { get; set; }
         [XmlElement("source")]
-        public string Source { get; set; }
+        public XMLSource Source { get; set; }
     }
 }

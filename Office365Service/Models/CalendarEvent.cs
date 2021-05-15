@@ -7,6 +7,14 @@ namespace Office365Service.Models
 {
     public class CalendarEvent
     {
+        public CalendarEvent()
+        {
+            Start = new CalendarEventTimeZone();
+            End = new CalendarEventTimeZone();
+            Body = new CalendarEventBody();
+            Location = new CalendarEventLocation();
+            Organizer = new CalendarEventOrganizer();
+        }
         [JsonProperty("subject")]
         public string Subject { get; set; }
         [JsonProperty("start")]

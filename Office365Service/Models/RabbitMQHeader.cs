@@ -8,8 +8,8 @@ namespace Office365Service.Models
     public class RabbitMQHeader
     {
         [XmlElement("method")]
-        public string Method { get; set; }
+        public XMLMethod Method { get; set; }
         [XmlElement("source")]
-        public string Source { get; set; }
+        public XMLSource Source { get; set; }
     }
 }

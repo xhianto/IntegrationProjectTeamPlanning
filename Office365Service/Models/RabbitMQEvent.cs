@@ -8,6 +8,11 @@ namespace Office365Service.Models
     [Serializable, XmlRoot(ElementName = "event")]
     public class RabbitMQEvent
     {
+        public RabbitMQEvent()
+        {
+            Header = new RabbitMQHeader();
+        }
+
         [XmlElement("header")]
         public RabbitMQHeader Header { get; set; }
         [XmlElement("uuid")]

@@ -72,11 +72,25 @@ namespace RabbitMQUserConsumer
                     Console.WriteLine(result.EmailAddress);
                     Console.WriteLine(result.Role);
                     //Console.WriteLine(result.location);
-
-                    if (result.Header.Method.ToLower() == "create" && result.Header.Source.ToLower() == "planning")
+                    if (result.Header.Source != XMLSource.PLANNING)
                     {
-                        OfficeService.UserPost(result);
+                        switch (result.Header.Method)
+                        {
+                            case XMLMethod.CREATE:
+                                OfficeService.UserCreate(result);
+                                break;
+                            case XMLMethod.UPDATE:
+                                OfficeService.UserUpdate(result);
+                                break;
+                            case XMLMethod.DELETE:
+                                OfficeService.UserDelete(result);
+                                break;
+                        }
                     }
+                    //if (result.Header.Method == XMLMethod.CREATE && result.Header.Source != XMLSource.PLANNING)
+                    //{
+                    //    OfficeService.UserPost(result);
+                    //}
                 }
             };
 

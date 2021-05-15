@@ -57,7 +57,6 @@ namespace RabbitMQConsumer
                 //if (xml.)
                 //if (xml.IndexOf("?", 0, 1) == 0)
                 //    xml = xml.Substring(1);
-                Console.WriteLine(xml);
                 //string _byteOrderMarkUtf8 = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble());
                 //if (xml.StartsWith(_byteOrderMarkUtf8))
                 //    xml = xml.Remove(0, _byteOrderMarkUtf8.Length);
@@ -75,11 +74,25 @@ namespace RabbitMQConsumer
                     Console.WriteLine(result.Start);
                     Console.WriteLine(result.End);
                     //Console.WriteLine(result.location);
-
-                    if (result.Header.Method.ToLower() == "create" && result.Header.Source.ToLower() == "planning")
+                    if (result.Header.Source != XMLSource.PLANNING)
                     {
-                        OfficeService.Post(result);
+                        switch (result.Header.Method)
+                        {
+                            case XMLMethod.CREATE:
+                                OfficeService.EventCreate(result);
+                                break;
+                            case XMLMethod.UPDATE:
+                                OfficeService.EventUpdate(result);
+                                break;
+                            case XMLMethod.DELETE:
+                                OfficeService.EventDelete(result);
+                                break;
+                        }
                     }
+                    //if (result.Header.Method == XMLMethod.CREATE && result.Header.Source != XMLSource.PLANNING)
+                    //{
+                    //    OfficeService.Post(result);
+                    //}
                 }
             };
 

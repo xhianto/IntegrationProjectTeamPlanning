@@ -14,22 +14,27 @@ namespace Office365Service
         public Token BearerToken = new Token();
         public Token RefreshAccesToken()
         {
-            if (!string.IsNullOrEmpty(Constant.Tenant_Id))
+            if (BearerToken.Access_token == null || BearerToken.TimeStamp.AddSeconds(BearerToken.Expires_in - 120) < DateTime.Now) //refresh token 2 min voor expire tijd
             {
-                RestClient restClient = new RestClient();
-                RestRequest restRequest = new RestRequest();
-
-                restRequest.AddParameter("client_id", Constant.Client_Id);
-                restRequest.AddParameter("scope", Constant.Scopes);
-                restRequest.AddParameter("grant_type", "client_credentials");
-                restRequest.AddParameter("client_secret", Constant.Client_Secret);
-
-                restClient.BaseUrl = new Uri($"https://login.microsoftonline.com/{Constant.Tenant_Id}/oauth2/v2.0/token");
-                var response = restClient.Post(restRequest);
-
-                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                if (!string.IsNullOrEmpty(Constant.Tenant_Id))
                 {
-                    BearerToken = JsonConvert.DeserializeObject<Token>(response.Content);
+                    RestClient restClient = new RestClient();
+                    RestRequest restRequest = new RestRequest();
+
+                    restRequest.AddParameter("client_id", Constant.Client_Id);
+                    restRequest.AddParameter("scope", Constant.Scopes);
+                    restRequest.AddParameter("grant_type", "client_credentials");
+                    restRequest.AddParameter("client_secret", Constant.Client_Secret);
+
+                    restClient.BaseUrl = new Uri($"https://login.microsoftonline.com/{Constant.Tenant_Id}/oauth2/v2.0/token");
+                    var response = restClient.Post(restRequest);
+
+                    if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                    {
+                        BearerToken = JsonConvert.DeserializeObject<Token>(response.Content);
+                        BearerToken.TimeStamp = DateTime.Now;
+                        Console.WriteLine(response.Content);
+                    }
                 }
             }
             return BearerToken;
@@ -81,9 +86,9 @@ namespace Office365Service
         {
             
             RabbitMQEvent rabbitMQEvent = new RabbitMQEvent();
-            rabbitMQEvent.Header = new RabbitMQHeader();
-            rabbitMQEvent.Header.Method = "CREATE";
-            rabbitMQEvent.Header.Source = "PLANNING";
+            //rabbitMQEvent.Header = new RabbitMQHeader();
+            rabbitMQEvent.Header.Method = XMLMethod.CREATE;
+            rabbitMQEvent.Header.Source = XMLSource.PLANNING;
             rabbitMQEvent.UUID = new Guid(uuid);
             rabbitMQEvent.EntityVersion = 1;
             rabbitMQEvent.Title = calendarEvent.Subject;
@@ -130,10 +135,10 @@ namespace Office365Service
             {
                 MemoryStream mStream = new MemoryStream();
                 XmlSerializer serializer = new XmlSerializer(typeof(T));
-                XmlTextWriter writer = new XmlTextWriter(mStream, Encoding.UTF8);
+                XmlTextWriter writer = new XmlTextWriter(mStream, null);
                 writer.Formatting = System.Xml.Formatting.Indented;
                 serializer.Serialize(writer, obj);
-                xml = Encoding.UTF8.GetString(mStream.ToArray()).Substring(1);
+                xml = Encoding.UTF8.GetString(mStream.ToArray());
 
             }
             catch (Exception ex)
@@ -142,34 +147,34 @@ namespace Office365Service
             }
             return xml;
         }
-        public void Post(RabbitMQEvent rabbitMQEvent)
+        public void EventCreate(RabbitMQEvent rabbitMQEvent)
         {
             RestClient restClient = new RestClient();
             RestRequest restRequest = new RestRequest();
 
             CalendarEvent calendarEvent = new CalendarEvent();
             calendarEvent.Subject = rabbitMQEvent.Title;
-            calendarEvent.Start = new CalendarEventTimeZone();
-            if (rabbitMQEvent.Header.Source.ToLower() != "canvas")
-                calendarEvent.Start.DateTime = DateTime.Parse(rabbitMQEvent.Start.ToString());
-            else
-                calendarEvent.Start.DateTime = DateTime.ParseExact(rabbitMQEvent.Start.ToString(), "d/MM/yyyy H:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+            //calendarEvent.Start = new CalendarEventTimeZone();
+            //if (rabbitMQEvent.Header.Source.ToLower() != "canvas")
+            calendarEvent.Start.DateTime = DateTime.Parse(rabbitMQEvent.Start.ToString());
+            //else
+            //    calendarEvent.Start.DateTime = DateTime.ParseExact(rabbitMQEvent.Start.ToString(), "d/MM/yyyy H:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
             calendarEvent.Start.Zone = "Romance Standard Time";
-            calendarEvent.End = new CalendarEventTimeZone();
-            if (rabbitMQEvent.Header.Source.ToLower() != "canvas")
-                calendarEvent.End.DateTime = DateTime.Parse(rabbitMQEvent.End.ToString());
-            else
-                calendarEvent.End.DateTime = DateTime.ParseExact(rabbitMQEvent.End.ToString(), "d/MM/yyyy H:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+            //calendarEvent.End = new CalendarEventTimeZone();
+            //if (rabbitMQEvent.Header.Source.ToLower() != "canvas")
+            calendarEvent.End.DateTime = DateTime.Parse(rabbitMQEvent.End.ToString());
+            //else
+            //    calendarEvent.End.DateTime = DateTime.ParseExact(rabbitMQEvent.End.ToString(), "d/MM/yyyy H:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
             calendarEvent.End.Zone = "Romance Standard Time";
             //calendarEvent.BodyPreview = rabbitMQEvent.Description;
-            calendarEvent.Body = new CalendarEventBody();
+            //calendarEvent.Body = new CalendarEventBody();
             calendarEvent.Body.ContentType = "text";
             calendarEvent.Body.Content = rabbitMQEvent.Description;
-            calendarEvent.Organizer = new CalendarEventOrganizer();
-            calendarEvent.Organizer.EmailAddress = new CalendarEventEmailAddress();
+            //calendarEvent.Organizer = new CalendarEventOrganizer();
+            //calendarEvent.Organizer.EmailAddress = new CalendarEventEmailAddress();
             calendarEvent.Organizer.EmailAddress.Address = rabbitMQEvent.OrganiserId.ToString();
-            calendarEvent.Location = new CalendarEventLocation();
-            calendarEvent.Location.Address = new CalendarEventLocationAddress();
+            //calendarEvent.Location = new CalendarEventLocation();
+            //calendarEvent.Location.Address = new CalendarEventLocationAddress();
             //calendarEvent.Location.DisplayName = rabbitMQEvent.Location;
             string[] location = rabbitMQEvent.Location.Split('%');
             calendarEvent.Location.Address.Street = location[0] + " " + location[1] + " " + location[2];
@@ -192,9 +197,9 @@ namespace Office365Service
         public string getHeartBeat()
         {
             RabbitMQHeartBeat heartBeat = new RabbitMQHeartBeat();
-            heartBeat.Header = new RabbitMQHeartBeatHeader();
-            heartBeat.Header.Status = "ONLINE";
-            heartBeat.Header.Source = "PLANNING";
+            //heartBeat.Header = new RabbitMQHeartBeatHeader();
+            heartBeat.Header.Status = XMLStatus.ONLINE;
+            heartBeat.Header.Source = XMLSource.PLANNING;
             heartBeat.TimeStamp = DateTime.Now;
 
             return ConvertObjectToXML(heartBeat);
@@ -202,10 +207,12 @@ namespace Office365Service
         public string ConvertUserToRabbitMQUser(User user)
         {
             RabbitMQUser rabbitMQUser = new RabbitMQUser();
-            rabbitMQUser.Header = new RabbitMQHeader();
+            //rabbitMQUser.Header = new RabbitMQHeader();
 
-            rabbitMQUser.Header.Method = "CREATE";
-            rabbitMQUser.Header.Source = "PLANNING";
+            //rabbitMQUser.Header.Method = XMLMethod.DELETE;
+            rabbitMQUser.Header.Method = XMLMethod.CREATE;
+            rabbitMQUser.Header.Source = XMLSource.PLANNING;
+            //rabbitMQUser.UUID = new Guid("42c5fb9e-a9db-47f9-af38-297cb7b88654");
             rabbitMQUser.UUID = new Guid(user.Id);
             rabbitMQUser.EntityVersion = 1;
             rabbitMQUser.LastName = user.SurName;
@@ -214,7 +221,7 @@ namespace Office365Service
             rabbitMQUser.Role = "Student";
             return ConvertObjectToXML(rabbitMQUser);
         }
-        public void UserPost(RabbitMQUser rabbitMQUser)
+        public void UserCreate(RabbitMQUser rabbitMQUser)
         {
             //Mock data om nieuw user aan te maken
             rabbitMQUser = new RabbitMQUser();
@@ -248,6 +255,32 @@ namespace Office365Service
 
             restClient.BaseUrl = new Uri($"https://graph.microsoft.com/v1.0/users");
             var response = restClient.Post(restRequest);
+
+            Console.WriteLine(response.StatusCode);
+        }
+        public void EventUpdate(RabbitMQEvent rabbitMQEvent)
+        {
+            Console.WriteLine("Update van Event nog niet klaar!");
+        }
+        public void EventDelete(RabbitMQEvent rabbitMQEvent)
+        {
+            Console.WriteLine("Delete van Event nog niet klaar!");
+        }
+        public void UserUpdate(RabbitMQUser rabbitMQUser)
+        {
+            Console.WriteLine("Update van User nog niet klaar!");
+        }
+        public void UserDelete(RabbitMQUser rabbitMQUser)
+        {
+            Console.WriteLine("Delete van User nog niet klaar!");
+            RestClient restClient = new RestClient();
+            RestRequest restRequest = new RestRequest();
+            BearerToken = RefreshAccesToken();
+
+            restRequest.AddHeader("Authorization", BearerToken.Token_type + " " + BearerToken.Access_token);
+            Console.WriteLine(rabbitMQUser.UUID);
+            restClient.BaseUrl = new Uri($"https://graph.microsoft.com/v1.0/users/{rabbitMQUser.UUID}");
+            var response = restClient.Delete(restRequest);
 
             Console.WriteLine(response.StatusCode);
         }
