@@ -131,8 +131,13 @@ namespace Office365Service
             rabbitMQEvent.Description = "Komt dit door?";
             rabbitMQEvent.Start = calendarEvent.Start.DateTime;
             rabbitMQEvent.End = calendarEvent.End.DateTime;
+            string straat = ConcatStreetNrAndBus(calendarEvent);
+            rabbitMQEvent.Location = straat + "%" + calendarEvent.Location.Address.City + "%" + calendarEvent.Location.Address.PostalCode;
+            return ConvertObjectToXML(rabbitMQEvent);
+        }
 
-
+        private static string ConcatStreetNrAndBus(CalendarEvent calendarEvent)
+        {
             string straat = "";
             string[] hulp = calendarEvent.Location.Address.Street.Split(' ');
             if (hulp.Length == 2)
@@ -161,8 +166,8 @@ namespace Office365Service
                     straat += hulp[hulp.Length - 2] + "%" + huisnummer + "%";
                 }
             }
-            rabbitMQEvent.Location = straat + "%" + calendarEvent.Location.Address.City + "%" + calendarEvent.Location.Address.PostalCode;
-            return ConvertObjectToXML(rabbitMQEvent);
+
+            return straat;
         }
 
         public string ConvertObjectToXML<T>(T obj)
