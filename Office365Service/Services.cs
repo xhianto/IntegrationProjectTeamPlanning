@@ -40,15 +40,21 @@ namespace Office365Service
             return BearerToken;
         }
 
+        private void SetRestRequestHeader(RestRequest restRequest)
+        {
+            restRequest.AddHeader("Authorization", BearerToken.Token_type + " " + BearerToken.Access_token);
+            restRequest.AddHeader("Prefer", "outlook.timezone=\"Romance Standard Time\"");
+            restRequest.AddHeader("Prefer", "outlook.body-content-type=\"text\"");
+        }
+
+
         public string GetUUIDFromEmail(string email)
         {
             RestClient restClient = new RestClient();
             RestRequest restRequest = new RestRequest();
             string useruuid = "";
 
-            restRequest.AddHeader("Authorization", BearerToken.Token_type + " " + BearerToken.Access_token);
-            restRequest.AddHeader("Prefer", "outlook.timezone=\"Romance Standard Time\"");
-            restRequest.AddHeader("Prefer", "outlook.body-content-type=\"text\"");
+            SetRestRequestHeader(restRequest);
 
             restClient.BaseUrl = new Uri($"https://graph.microsoft.com/v1.0/users/{email}");
             var response = restClient.Get(restRequest);
@@ -60,6 +66,8 @@ namespace Office365Service
             }
             return useruuid;
         }
+
+
         public string GetEmailFromUUID(string uuid)
         {
             string email = "";
@@ -67,9 +75,12 @@ namespace Office365Service
             RestRequest restRequest = new RestRequest();
             BearerToken = RefreshAccesToken();
 
-            restRequest.AddHeader("Authorization", BearerToken.Token_type + " " + BearerToken.Access_token);
-            restRequest.AddHeader("Prefer", "outlook.timezone=\"Romance Standard Time\"");
-            restRequest.AddHeader("Prefer", "outlook.body-content-type=\"text\"");
+            // refactor - removed redundant code
+            SetRestRequestHeader(restRequest);
+            //restRequest.AddHeader("Authorization", BearerToken.Token_type + " " + BearerToken.Access_token);
+            //restRequest.AddHeader("Prefer", "outlook.timezone=\"Romance Standard Time\"");
+            //restRequest.AddHeader("Prefer", "outlook.body-content-type=\"text\"");
+
 
             restClient.BaseUrl = new Uri($"https://graph.microsoft.com/v1.0/users/{uuid}");
             var response = restClient.Get(restRequest);
@@ -84,7 +95,7 @@ namespace Office365Service
 
         public string ConvertCalendarEventToRabbitMQEvent(CalendarEvent calendarEvent, string uuid)
         {
-            
+
             RabbitMQEvent rabbitMQEvent = new RabbitMQEvent();
             //rabbitMQEvent.Header = new RabbitMQHeader();
             rabbitMQEvent.Header.Method = XMLMethod.CREATE;
