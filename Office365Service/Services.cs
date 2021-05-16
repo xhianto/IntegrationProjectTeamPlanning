@@ -12,6 +12,12 @@ namespace Office365Service
     public class Services
     {
         public Token BearerToken = new Token();
+
+        /// <summary>
+        /// Method for getting and staying authenticated on MS
+        /// Will refresh 2 minutes before expiring
+        /// </summary>
+        /// <returns>a valid BearerToken</returns>
         public Token RefreshAccesToken()
         {
             if (BearerToken.Access_token == null || BearerToken.TimeStamp.AddSeconds(BearerToken.Expires_in - 120) < DateTime.Now) //refresh token 2 min voor expire tijd
@@ -40,6 +46,12 @@ namespace Office365Service
             return BearerToken;
         }
 
+
+        /// <summary>
+        /// Method for setting the header of rest requests
+        /// Uses the BearerToken for authorization and sets the timezone to Roman Standard Time and the type to text
+        /// </summary>
+        /// <param name="restRequest">a rest request authorized to call the MS Graph API</param>
         private void SetRestRequestHeader(RestRequest restRequest)
         {
             restRequest.AddHeader("Authorization", BearerToken.Token_type + " " + BearerToken.Access_token);
@@ -48,6 +60,11 @@ namespace Office365Service
         }
 
 
+        /// <summary>
+        /// Method to search the MSGraph API for the 'local' UUID (EntitySource_Id), given the emailaddress
+        /// </summary>
+        /// <param name="email">the emailaddress of the user being searched</param>
+        /// <returns>the 'local' UUID of the user (in MS AD) being searched</returns>
         public string GetUUIDFromEmail(string email)
         {
             RestClient restClient = new RestClient();
@@ -58,16 +75,24 @@ namespace Office365Service
 
             restClient.BaseUrl = new Uri($"https://graph.microsoft.com/v1.0/users/{email}");
             var response = restClient.Get(restRequest);
+
+            // if the request is succesfully executed by the MS Graph API
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
                 Console.WriteLine(response.Content);
+                // convert the JSON response from the MS Graph API to a User instance 
                 User user = JsonConvert.DeserializeObject<User>(response.Content);
+
                 useruuid = user.Id;
             }
             return useruuid;
         }
 
-
+        /// <summary>
+        /// Method to search the MSGraph API for the emailaddress, given the local UUID
+        /// </summary>
+        /// <param name="uuid">the 'local' UUID of the user (in MS AD) being searched</param>
+        /// <returns>the emailaddress of the user being searched</returns>
         public string GetEmailFromUUID(string uuid)
         {
             string email = "";
@@ -75,23 +100,22 @@ namespace Office365Service
             RestRequest restRequest = new RestRequest();
             BearerToken = RefreshAccesToken();
 
-            // refactor - removed redundant code
             SetRestRequestHeader(restRequest);
-            //restRequest.AddHeader("Authorization", BearerToken.Token_type + " " + BearerToken.Access_token);
-            //restRequest.AddHeader("Prefer", "outlook.timezone=\"Romance Standard Time\"");
-            //restRequest.AddHeader("Prefer", "outlook.body-content-type=\"text\"");
-
 
             restClient.BaseUrl = new Uri($"https://graph.microsoft.com/v1.0/users/{uuid}");
             var response = restClient.Get(restRequest);
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
                 //Console.WriteLine(response.Content);
+
+                // convert the JSON response from the MS Graph API to a User instance 
                 User user = JsonConvert.DeserializeObject<User>(response.Content);
+
                 email = user.UserPrincipalName;
             }
             return email;
         }
+
 
         public string ConvertCalendarEventToRabbitMQEvent(CalendarEvent calendarEvent, string uuid)
         {
@@ -107,6 +131,8 @@ namespace Office365Service
             rabbitMQEvent.Description = "Komt dit door?";
             rabbitMQEvent.Start = calendarEvent.Start.DateTime;
             rabbitMQEvent.End = calendarEvent.End.DateTime;
+
+
             string straat = "";
             string[] hulp = calendarEvent.Location.Address.Street.Split(' ');
             if (hulp.Length == 2)
