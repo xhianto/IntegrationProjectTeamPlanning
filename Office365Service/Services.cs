@@ -16,6 +16,7 @@ namespace Office365Service
     {
 
         /* --- GENERAL & HELPER SERVICES --- */
+
         public Token BearerToken = new Token();
 
         /// <summary>
@@ -56,7 +57,7 @@ namespace Office365Service
         /// Uses the BearerToken for authorization and sets the timezone to Roman Standard Time and the type to text
         /// </summary>
         /// <param name="restRequest">a rest request authorized to call the MS Graph API</param>
-        private void SetRestRequestHeader(RestRequest restRequest)
+        public static void SetRestRequestHeader(RestRequest restRequest)
         {
             restRequest.AddHeader("Authorization", BearerToken.Token_type + " " + BearerToken.Access_token);
             restRequest.AddHeader("Prefer", "outlook.timezone=\"Romance Standard Time\"");

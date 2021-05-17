@@ -9,6 +9,7 @@ using System.Text;
 using System.IO;
 using System.Xml;
 
+
 namespace RabbitMQProducer
 {
     class Program
@@ -24,12 +25,15 @@ namespace RabbitMQProducer
             List<CalendarEvent> events = new List<CalendarEvent>();
             Console.WriteLine(BearerToken.Access_token);
 
+
             RestClient restClient = new RestClient();
             RestRequest restRequest = new RestRequest();
 
-            restRequest.AddHeader("Authorization", BearerToken.Token_type + " " + BearerToken.Access_token);
-            restRequest.AddHeader("Prefer", "outlook.timezone=\"Romance Standard Time\"");
-            restRequest.AddHeader("Prefer", "outlook.body-content-type=\"text\"");
+            Services.SetRestRequestHeader(restRequest);
+            //restRequest.AddHeader("Authorization", BearerToken.Token_type + " " + BearerToken.Access_token);
+            //restRequest.AddHeader("Prefer", "outlook.timezone=\"Romance Standard Time\"");
+            //restRequest.AddHeader("Prefer", "outlook.body-content-type=\"text\"");
+            
 
             restClient.BaseUrl = new Uri($"https://graph.microsoft.com/v1.0/users/{uuid}/calendar/events");
             var response = restClient.Get(restRequest);
