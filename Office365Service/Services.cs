@@ -14,6 +14,8 @@ namespace Office365Service
     /// </summary>
     public class Services
     {
+
+        /* --- GENERAL & HELPER SERVICES --- */
         public Token BearerToken = new Token();
 
         /// <summary>
@@ -117,6 +119,38 @@ namespace Office365Service
             return email;
         }
 
+
+        /// <summary>
+        /// Method for converting any type of object to an xml string
+        /// </summary>
+        /// <typeparam name="T">Generic type</typeparam>
+        /// <param name="obj">Generic object</param>
+        /// <returns></returns>
+        public string ConvertObjectToXML<T>(T obj)
+        {
+            string xml = "";
+            try
+            {
+                MemoryStream mStream = new MemoryStream();
+                XmlSerializer serializer = new XmlSerializer(typeof(T));
+                XmlTextWriter writer = new XmlTextWriter(mStream, null);
+                writer.Formatting = System.Xml.Formatting.Indented;
+                serializer.Serialize(writer, obj);
+                xml = Encoding.UTF8.GetString(mStream.ToArray());
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            return xml;
+        }
+
+
+
+        /* --- EVENT RELATED SERVICES --- */
+
+
         /// <summary>
         /// Method to convert MS Graph Calendar data so the message broker RabbitMQ can handle them. 
         /// </summary>
@@ -142,6 +176,7 @@ namespace Office365Service
             rabbitMQEvent.Location = straat + "%" + calendarEvent.Location.Address.City + "%" + calendarEvent.Location.Address.PostalCode;
             return ConvertObjectToXML(rabbitMQEvent);
         }
+
 
         /// <summary>
         /// Method for concatting street, number and bus (if present) into one large '&'-seprated string (format: 'street&nr&bus&')
@@ -182,37 +217,11 @@ namespace Office365Service
             return straat;
         }
 
-        /// <summary>
-        /// Method for converting any type of object to an xml string
-        /// </summary>
-        /// <typeparam name="T">Generic type</typeparam>
-        /// <param name="obj">Generic object</param>
-        /// <returns></returns>
-        public string ConvertObjectToXML<T>(T obj)
-        {
-            string xml = "";
-            try
-            {
-                MemoryStream mStream = new MemoryStream();
-                XmlSerializer serializer = new XmlSerializer(typeof(T));
-                XmlTextWriter writer = new XmlTextWriter(mStream, null);
-                writer.Formatting = System.Xml.Formatting.Indented;
-                serializer.Serialize(writer, obj);
-                xml = Encoding.UTF8.GetString(mStream.ToArray());
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            return xml;
-        }
-
 
         /// <summary>
-        /// Method posting an incoming event into the MS Graph API.
+        /// Method posting an incoming new event into the MS Graph API.
         /// </summary>
-        /// <param name="rabbitMQEvent"></param>
+        /// <param name="rabbitMQEvent">New event sent by the RabbitMQ message broker</param>
         public void EventCreate(RabbitMQEvent rabbitMQEvent)
         {
               
@@ -275,10 +284,20 @@ namespace Office365Service
         }
 
 
+        /// <summary>
+        /// Method posting an incoming change of an event into the MS Graph API.
+        /// </summary>
+        /// <param name="rabbitMQEvent">Updated event sent by the RabbitMQ message broker</param>
         public void EventUpdate(RabbitMQEvent rabbitMQEvent)
         {
             Console.WriteLine("Update van Event nog niet klaar!");
         }
+
+
+        /// <summary>
+        /// Method posting an incoming delete of an event into the MS Graph API.
+        /// </summary>
+        /// <param name="rabbitMQEvent">Deleted event sent by the RabbitMQ message broker</param>
         public void EventDelete(RabbitMQEvent rabbitMQEvent)
         {
             Console.WriteLine("Delete van Event nog niet klaar!");
@@ -313,7 +332,10 @@ namespace Office365Service
             return ConvertObjectToXML(rabbitMQUser);
         }
 
-
+        /// <summary>
+        /// Method posting an incoming new user into the MS Graph API.
+        /// </summary>
+        /// <param name="rabbitMQUser">New user sent by the RabbitMQ message broker</param>
         public void UserCreate(RabbitMQUser rabbitMQUser)
         {
             //Mock data om nieuw user aan te maken
@@ -352,11 +374,21 @@ namespace Office365Service
             Console.WriteLine(response.StatusCode);
         }
 
+
+        /// <summary>
+        /// Method posting an incoming change of a user into the MS Graph API.
+        /// </summary>
+        /// <param name="rabbitMQUser">Updated user sent by the RabbitMQ message broker</param>
         public void UserUpdate(RabbitMQUser rabbitMQUser)
         {
             Console.WriteLine("Update van User nog niet klaar!");
         }
 
+
+        /// <summary>
+        /// Method posting an incoming delete of a user into the MS Graph API.
+        /// </summary>
+        /// <param name="rabbitMQUser">Deleted user sent by the RabbitMQ message broker</param>
         public void UserDelete(RabbitMQUser rabbitMQUser)
         {
             Console.WriteLine("Delete van User nog niet klaar!");
@@ -371,6 +403,7 @@ namespace Office365Service
 
             Console.WriteLine(response.StatusCode);
         }
+
 
 
         /* --- MONITORING RELATED SERVICES --- */
