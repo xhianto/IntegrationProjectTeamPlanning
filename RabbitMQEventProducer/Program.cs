@@ -30,7 +30,6 @@ namespace RabbitMQProducer
         /// <summary>
         /// Main method for publishing MS Graph API calendar events to the RabbitMQ Message Broker
         /// </summary>
-        /// <param name="args"></param>
         static void Main(string[] args)
         {
             /* --- Retrieve the MS Graph UUID corresponding to the given emailaddress --- */
@@ -49,7 +48,7 @@ namespace RabbitMQProducer
             //restRequest.AddHeader("Prefer", "outlook.body-content-type=\"text\"");
             restClient.BaseUrl = new Uri($"https://graph.microsoft.com/v1.0/users/{uuid}/calendar/events");
 
-            /* --- Perform the rest request and place response in list of Calendar Events --- */
+            /* --- Perform the GET rest request and place response in list of Calendar Events --- */
             var response = restClient.Get(restRequest);
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
