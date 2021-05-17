@@ -43,7 +43,7 @@ namespace RabbitMQProducer
             /* --- prepare the restclient --- */
             RestClient restClient = new RestClient();
             RestRequest restRequest = new RestRequest();
-            Services.SetRestRequestHeader(restRequest);
+            OfficeService.SetRestRequestHeader(restRequest);
             //restRequest.AddHeader("Authorization", BearerToken.Token_type + " " + BearerToken.Access_token);
             //restRequest.AddHeader("Prefer", "outlook.timezone=\"Romance Standard Time\"");
             //restRequest.AddHeader("Prefer", "outlook.body-content-type=\"text\"");
