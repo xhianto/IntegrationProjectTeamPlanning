@@ -12,21 +12,34 @@ using RestSharp;
 
 namespace RabbitMQConsumer
 {
+    /// <summary>
+    /// Method to consume MS Graph API calendar events from the RabbitMQ Message Broker
+    /// </summary>
     class Program
     {
+        /* --- Instatiate the Services --- */
         private static Services OfficeService = new Services();
+
+
+        /// <summary>
+        /// Main method for consuming MS Graph API calendar events from the RabbitMQ Message Broker
+        /// </summary>
         static void Main(string[] args)
         {
             List<CalendarEvent> events = new List<CalendarEvent>();
             Uri rabbitMQUri = new Uri(Constant.RabbitMQConnectionUrl);
             string queueName = Constant.RabbitMQEventQueueName;
 
+            /* --- prepare a RabbitMQ connection model for the Calendar Event --- */
             var factory = new ConnectionFactory
             {
                 Uri = rabbitMQUri
             };
             using var connection = factory.CreateConnection();
             using var channel = connection.CreateModel();
+
+
+
             channel.QueueDeclare(
                 queueName,
                 durable: true,
