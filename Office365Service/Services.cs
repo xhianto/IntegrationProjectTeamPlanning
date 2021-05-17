@@ -9,6 +9,9 @@ using System.Xml.Serialization;
 
 namespace Office365Service
 {
+    /// <summary>
+    /// Services supporting the exchange of data between MS Graph API and RabbitMQ message broker.
+    /// </summary>
     public class Services
     {
         public Token BearerToken = new Token();
@@ -46,7 +49,6 @@ namespace Office365Service
             return BearerToken;
         }
 
-
         /// <summary>
         /// Method for setting the header of rest requests
         /// Uses the BearerToken for authorization and sets the timezone to Roman Standard Time and the type to text
@@ -58,7 +60,6 @@ namespace Office365Service
             restRequest.AddHeader("Prefer", "outlook.timezone=\"Romance Standard Time\"");
             restRequest.AddHeader("Prefer", "outlook.body-content-type=\"text\"");
         }
-
 
         /// <summary>
         /// Method to search the MSGraph API for the 'local' UUID (EntitySource_Id), given the emailaddress
@@ -116,7 +117,12 @@ namespace Office365Service
             return email;
         }
 
-
+        /// <summary>
+        /// Method to convert MS Graph Calendar data so the message broker RabbitMQ can handle them. 
+        /// </summary>
+        /// <param name="calendarEvent">a calendar event with attributes of MS Graph API</param>
+        /// <param name="uuid">the UUID of the event in MS Graph API</param>
+        /// <returns>event in xml format, ready to send to the RabbitMQ message queue</returns>
         public string ConvertCalendarEventToRabbitMQEvent(CalendarEvent calendarEvent, string uuid)
         {
 
@@ -131,11 +137,17 @@ namespace Office365Service
             rabbitMQEvent.Description = "Komt dit door?";
             rabbitMQEvent.Start = calendarEvent.Start.DateTime;
             rabbitMQEvent.End = calendarEvent.End.DateTime;
+
             string straat = ConcatStreetNrAndBus(calendarEvent);
             rabbitMQEvent.Location = straat + "%" + calendarEvent.Location.Address.City + "%" + calendarEvent.Location.Address.PostalCode;
             return ConvertObjectToXML(rabbitMQEvent);
         }
 
+        /// <summary>
+        /// Method for concatting street, number and bus (if present) into one large '&'-seprated string (format: 'street&nr&bus&')
+        /// </summary>
+        /// <param name="calendarEvent">a calendar event with attributes of MS Graph API</param>
+        /// <returns>one large '&'-seprated string ('street&nr&bus&')</returns>
         private static string ConcatStreetNrAndBus(CalendarEvent calendarEvent)
         {
             string straat = "";
@@ -170,6 +182,12 @@ namespace Office365Service
             return straat;
         }
 
+        /// <summary>
+        /// Method for converting any type of object to an xml string
+        /// </summary>
+        /// <typeparam name="T">Generic type</typeparam>
+        /// <param name="obj">Generic object</param>
+        /// <returns></returns>
         public string ConvertObjectToXML<T>(T obj)
         {
             string xml = "";
@@ -189,14 +207,25 @@ namespace Office365Service
             }
             return xml;
         }
+
+
+        /// <summary>
+        /// Method posting an incoming event into the MS Graph API.
+        /// </summary>
+        /// <param name="rabbitMQEvent"></param>
         public void EventCreate(RabbitMQEvent rabbitMQEvent)
         {
+              
+            /* --- prepare the restclient --- */
             RestClient restClient = new RestClient();
             RestRequest restRequest = new RestRequest();
+            
 
+            /* --- create an MS Graph CalendarEvent and fill the properties with the corresponding values from the received RabbitMQEvent --- */
             CalendarEvent calendarEvent = new CalendarEvent();
             calendarEvent.Subject = rabbitMQEvent.Title;
             //calendarEvent.Start = new CalendarEventTimeZone();
+
             //if (rabbitMQEvent.Header.Source.ToLower() != "canvas")
             calendarEvent.Start.DateTime = DateTime.Parse(rabbitMQEvent.Start.ToString());
             //else
@@ -222,32 +251,52 @@ namespace Office365Service
             calendarEvent.Location.Address.Street = location[0] + " " + location[1] + " " + location[2];
             calendarEvent.Location.Address.City = location[3];
             calendarEvent.Location.Address.PostalCode = location[4];
+
+
+            /* --- Retrieve a valid accestoken for creating the event in the MS Graph API --- */
             BearerToken = RefreshAccesToken();
 
+            /* --- Serialize the event into json and attach it to the rest request --- */
             var json = JsonConvert.SerializeObject(calendarEvent);
             restRequest.AddHeader("Authorization", BearerToken.Token_type + " " + BearerToken.Access_token);
             restRequest.AddJsonBody(json);
+
+            /* --- test --- */
             Console.WriteLine(json);
             //restRequest.AddHeader("Prefer", "outlook.timezone=\"Romance Standard Time\"");
             //restRequest.AddHeader("Prefer", "outlook.body-content-type=\"text\"");
 
+
+            /* --- execute the rest request to post the new event in the MS Graph API --- */
             restClient.BaseUrl = new Uri($"https://graph.microsoft.com/v1.0/users/{rabbitMQEvent.OrganiserId}/events");
             var response = restClient.Post(restRequest);
 
             Console.WriteLine(response.StatusCode);
         }
-        public string getHeartBeat()
-        {
-            RabbitMQHeartBeat heartBeat = new RabbitMQHeartBeat();
-            //heartBeat.Header = new RabbitMQHeartBeatHeader();
-            heartBeat.Header.Status = XMLStatus.ONLINE;
-            heartBeat.Header.Source = XMLSource.PLANNING;
-            heartBeat.TimeStamp = DateTime.Now;
 
-            return ConvertObjectToXML(heartBeat);
+
+        public void EventUpdate(RabbitMQEvent rabbitMQEvent)
+        {
+            Console.WriteLine("Update van Event nog niet klaar!");
         }
+        public void EventDelete(RabbitMQEvent rabbitMQEvent)
+        {
+            Console.WriteLine("Delete van Event nog niet klaar!");
+        }
+     
+
+
+
+        /* --- USER RELATED SERVICES --- */
+
+        /// <summary>
+        /// Method to convert MS Graph User data so the message broker RabbitMQ can handle them. 
+        /// </summary>
+        /// <param name="user">a user with attributes of MS Graph API</param>
+        /// <returns>user in xml format, ready to send to the RabbitMQ message queue</returns>
         public string ConvertUserToRabbitMQUser(User user)
         {
+            /* ---  --- */
             RabbitMQUser rabbitMQUser = new RabbitMQUser();
             //rabbitMQUser.Header = new RabbitMQHeader();
 
@@ -263,6 +312,8 @@ namespace Office365Service
             rabbitMQUser.Role = "Student";
             return ConvertObjectToXML(rabbitMQUser);
         }
+
+
         public void UserCreate(RabbitMQUser rabbitMQUser)
         {
             //Mock data om nieuw user aan te maken
@@ -300,18 +351,12 @@ namespace Office365Service
 
             Console.WriteLine(response.StatusCode);
         }
-        public void EventUpdate(RabbitMQEvent rabbitMQEvent)
-        {
-            Console.WriteLine("Update van Event nog niet klaar!");
-        }
-        public void EventDelete(RabbitMQEvent rabbitMQEvent)
-        {
-            Console.WriteLine("Delete van Event nog niet klaar!");
-        }
+
         public void UserUpdate(RabbitMQUser rabbitMQUser)
         {
             Console.WriteLine("Update van User nog niet klaar!");
         }
+
         public void UserDelete(RabbitMQUser rabbitMQUser)
         {
             Console.WriteLine("Delete van User nog niet klaar!");
@@ -326,5 +371,24 @@ namespace Office365Service
 
             Console.WriteLine(response.StatusCode);
         }
+
+
+        /* --- MONITORING RELATED SERVICES --- */
+
+        /// <summary>
+        /// Method to generate a system heartbeat for monitoring purposes
+        /// </summary>
+        /// <returns>the system heartbeat in XML format</returns>
+        public string getHeartBeat()
+        {
+            RabbitMQHeartBeat heartBeat = new RabbitMQHeartBeat();
+            //heartBeat.Header = new RabbitMQHeartBeatHeader();
+            heartBeat.Header.Status = XMLStatus.ONLINE;
+            heartBeat.Header.Source = XMLSource.PLANNING;
+            heartBeat.TimeStamp = DateTime.Now;
+
+            return ConvertObjectToXML(heartBeat);
+        }
+
     }
-}
+}  /* ---  --- */
