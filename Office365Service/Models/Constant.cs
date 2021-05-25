@@ -24,5 +24,8 @@ namespace Office365Service.Models
 
         // User
         public const string StandardPassword = "Test123$"; //of iets dergelijks met user name etc
+
+        //Monitoring Database
+        public const string DBConnectionString = "server=10.3.17.63;user=muuid;password=muuid;database=masteruuid;";
     }
 }

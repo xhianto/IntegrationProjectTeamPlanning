@@ -18,6 +18,7 @@ namespace Office365Service
         /* --- GENERAL & HELPER SERVICES --- */
 
         public Token BearerToken = new Token();
+        private MasterDBServices masterDBService = new MasterDBServices();
 
         /// <summary>
         /// Method for getting and staying authenticated on MS
@@ -164,8 +165,10 @@ namespace Office365Service
             RabbitMQEvent rabbitMQEvent = new RabbitMQEvent();
             //rabbitMQEvent.Header = new RabbitMQHeader();
             rabbitMQEvent.Header.Method = XMLMethod.CREATE;
-            rabbitMQEvent.Header.Source = XMLSource.PLANNING;
-            rabbitMQEvent.UUID = new Guid(uuid);
+            //rabbitMQEvent.Header.Source = XMLSource.PLANNING;
+            rabbitMQEvent.Header.Source = XMLSource.FRONTEND; //tester
+            //rabbitMQEvent.UUID = new Guid(uuid);
+            rabbitMQEvent.UUID = new Guid("f9daab25-bccd-11eb-b876-00155d110504"); //tester
             rabbitMQEvent.EntityVersion = 1;
             rabbitMQEvent.Title = calendarEvent.Subject;
             rabbitMQEvent.OrganiserId = new Guid(uuid);
@@ -225,63 +228,74 @@ namespace Office365Service
         /// <param name="rabbitMQEvent">New event sent by the RabbitMQ message broker</param>
         public void EventCreate(RabbitMQEvent rabbitMQEvent)
         {
-              
-            /* --- prepare the restclient --- */
-            RestClient restClient = new RestClient();
-            RestRequest restRequest = new RestRequest();
-            
-
-            /* --- create an MS Graph CalendarEvent and fill the properties with the corresponding values from the received RabbitMQEvent --- */
-            CalendarEvent calendarEvent = new CalendarEvent();
-            calendarEvent.Subject = rabbitMQEvent.Title;
-            //calendarEvent.Start = new CalendarEventTimeZone();
-
-            //if (rabbitMQEvent.Header.Source.ToLower() != "canvas")
-            calendarEvent.Start.DateTime = DateTime.Parse(rabbitMQEvent.Start.ToString());
-            //else
-            //    calendarEvent.Start.DateTime = DateTime.ParseExact(rabbitMQEvent.Start.ToString(), "d/MM/yyyy H:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
-            calendarEvent.Start.Zone = "Romance Standard Time";
-            //calendarEvent.End = new CalendarEventTimeZone();
-            //if (rabbitMQEvent.Header.Source.ToLower() != "canvas")
-            calendarEvent.End.DateTime = DateTime.Parse(rabbitMQEvent.End.ToString());
-            //else
-            //    calendarEvent.End.DateTime = DateTime.ParseExact(rabbitMQEvent.End.ToString(), "d/MM/yyyy H:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
-            calendarEvent.End.Zone = "Romance Standard Time";
-            //calendarEvent.BodyPreview = rabbitMQEvent.Description;
-            //calendarEvent.Body = new CalendarEventBody();
-            calendarEvent.Body.ContentType = "text";
-            calendarEvent.Body.Content = rabbitMQEvent.Description;
-            //calendarEvent.Organizer = new CalendarEventOrganizer();
-            //calendarEvent.Organizer.EmailAddress = new CalendarEventEmailAddress();
-            calendarEvent.Organizer.EmailAddress.Address = rabbitMQEvent.OrganiserId.ToString();
-            //calendarEvent.Location = new CalendarEventLocation();
-            //calendarEvent.Location.Address = new CalendarEventLocationAddress();
-            //calendarEvent.Location.DisplayName = rabbitMQEvent.Location;
-            string[] location = rabbitMQEvent.Location.Split('%');
-            calendarEvent.Location.Address.Street = location[0] + " " + location[1] + " " + location[2];
-            calendarEvent.Location.Address.City = location[3];
-            calendarEvent.Location.Address.PostalCode = location[4];
+            Master masterUserId = masterDBService.GetGraphIdFromMUUID(rabbitMQEvent.OrganiserId);
+            if (masterUserId != null)
+            {
+                /* --- prepare the restclient --- */
+                RestClient restClient = new RestClient();
+                RestRequest restRequest = new RestRequest();
 
 
-            /* --- Retrieve a valid accestoken for creating the event in the MS Graph API --- */
-            BearerToken = RefreshAccesToken();
+                /* --- create an MS Graph CalendarEvent and fill the properties with the corresponding values from the received RabbitMQEvent --- */
+                CalendarEvent calendarEvent = new CalendarEvent();
+                calendarEvent.Subject = rabbitMQEvent.Title;
+                //calendarEvent.Start = new CalendarEventTimeZone();
 
-            /* --- Serialize the event into json and attach it to the rest request --- */
-            var json = JsonConvert.SerializeObject(calendarEvent);
-            restRequest.AddHeader("Authorization", BearerToken.Token_type + " " + BearerToken.Access_token);
-            restRequest.AddJsonBody(json);
+                //if (rabbitMQEvent.Header.Source.ToLower() != "canvas")
+                calendarEvent.Start.DateTime = DateTime.Parse(rabbitMQEvent.Start.ToString());
+                //else
+                //    calendarEvent.Start.DateTime = DateTime.ParseExact(rabbitMQEvent.Start.ToString(), "d/MM/yyyy H:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+                calendarEvent.Start.Zone = "Romance Standard Time";
+                //calendarEvent.End = new CalendarEventTimeZone();
+                //if (rabbitMQEvent.Header.Source.ToLower() != "canvas")
+                calendarEvent.End.DateTime = DateTime.Parse(rabbitMQEvent.End.ToString());
+                //else
+                //    calendarEvent.End.DateTime = DateTime.ParseExact(rabbitMQEvent.End.ToString(), "d/MM/yyyy H:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+                calendarEvent.End.Zone = "Romance Standard Time";
+                //calendarEvent.BodyPreview = rabbitMQEvent.Description;
+                //calendarEvent.Body = new CalendarEventBody();
+                calendarEvent.Body.ContentType = "text";
+                calendarEvent.Body.Content = rabbitMQEvent.Description;
+                //calendarEvent.Organizer = new CalendarEventOrganizer();
+                //calendarEvent.Organizer.EmailAddress = new CalendarEventEmailAddress();
+                calendarEvent.Organizer.EmailAddress.Address = rabbitMQEvent.OrganiserId.ToString();
+                //calendarEvent.Location = new CalendarEventLocation();
+                //calendarEvent.Location.Address = new CalendarEventLocationAddress();
+                //calendarEvent.Location.DisplayName = rabbitMQEvent.Location;
+                string[] location = rabbitMQEvent.Location.Split('%');
+                calendarEvent.Location.Address.Street = location[0] + " " + location[1] + " " + location[2];
+                calendarEvent.Location.Address.City = location[3];
+                calendarEvent.Location.Address.PostalCode = location[4];
 
-            /* --- test --- */
-            Console.WriteLine(json);
-            //restRequest.AddHeader("Prefer", "outlook.timezone=\"Romance Standard Time\"");
-            //restRequest.AddHeader("Prefer", "outlook.body-content-type=\"text\"");
+
+                /* --- Retrieve a valid accestoken for creating the event in the MS Graph API --- */
+                BearerToken = RefreshAccesToken();
+
+                /* --- Serialize the event into json and attach it to the rest request --- */
+                var json = JsonConvert.SerializeObject(calendarEvent);
+                restRequest.AddHeader("Authorization", BearerToken.Token_type + " " + BearerToken.Access_token);
+                restRequest.AddJsonBody(json);
+
+                /* --- test --- */
+                Console.WriteLine(json);
+                //restRequest.AddHeader("Prefer", "outlook.timezone=\"Romance Standard Time\"");
+                //restRequest.AddHeader("Prefer", "outlook.body-content-type=\"text\"");
 
 
-            /* --- execute the rest request to post the new event in the MS Graph API --- */
-            restClient.BaseUrl = new Uri($"https://graph.microsoft.com/v1.0/users/{rabbitMQEvent.OrganiserId}/events");
-            var response = restClient.Post(restRequest);
+                /* --- execute the rest request to post the new event in the MS Graph API --- */
+                restClient.BaseUrl = new Uri($"https://graph.microsoft.com/v1.0/users/{masterUserId.SourceEntityId}/events");
+                var response = restClient.Post(restRequest);
 
-            Console.WriteLine(response.StatusCode);
+                Console.WriteLine(response.StatusCode);
+
+                if (response.StatusCode == System.Net.HttpStatusCode.Created)
+                {
+                    var responsJson = response.Content;
+                    CalendarEvent responseEvent = JsonConvert.DeserializeObject<CalendarEvent>(responsJson);
+                    Console.WriteLine(responseEvent.Id);
+                    masterDBService.CreateEntity(rabbitMQEvent.UUID, responseEvent.Id, "Event");
+                }
+            }
         }
 
 
@@ -291,7 +305,50 @@ namespace Office365Service
         /// <param name="rabbitMQEvent">Updated event sent by the RabbitMQ message broker</param>
         public void EventUpdate(RabbitMQEvent rabbitMQEvent)
         {
-            Console.WriteLine("Update van Event nog niet klaar!");
+            //Console.WriteLine("Update van Event nog niet klaar!");
+            Master masterUserId = masterDBService.GetGraphIdFromMUUID(rabbitMQEvent.OrganiserId);
+            Master masterEventId = masterDBService.GetGraphIdFromMUUID(rabbitMQEvent.UUID);
+            
+            if (masterEventId != null && masterUserId != null && masterDBService.CheckSourceEntityVersionIsHigher(rabbitMQEvent.UUID, rabbitMQEvent.Header.Source))
+            {
+                RestClient restClient = new RestClient();
+                RestRequest restRequest = new RestRequest();
+
+                CalendarEvent calendarEvent = new CalendarEvent();
+                calendarEvent.Subject = rabbitMQEvent.Title;
+
+                calendarEvent.Start.DateTime = DateTime.Parse(rabbitMQEvent.Start.ToString());
+                calendarEvent.Start.Zone = "Romance Standard Time";
+                calendarEvent.End.DateTime = DateTime.Parse(rabbitMQEvent.End.ToString());
+                calendarEvent.End.Zone = "Romance Standard Time";
+                calendarEvent.Body.ContentType = "text";
+                calendarEvent.Body.Content = rabbitMQEvent.Description;
+                calendarEvent.Organizer.EmailAddress.Address = rabbitMQEvent.OrganiserId.ToString();
+                string[] location = rabbitMQEvent.Location.Split('%');
+                calendarEvent.Location.Address.Street = location[0] + " " + location[1] + " " + location[2];
+                calendarEvent.Location.Address.City = location[3];
+                calendarEvent.Location.Address.PostalCode = location[4];
+
+                /* --- Retrieve a valid accestoken for creating the event in the MS Graph API --- */
+                BearerToken = RefreshAccesToken();
+
+                /* --- Serialize the event into json and attach it to the rest request --- */
+                var json = JsonConvert.SerializeObject(calendarEvent);
+
+                restRequest.AddHeader("Authorization", BearerToken.Token_type + " " + BearerToken.Access_token);
+                restRequest.AddJsonBody(json);
+
+                /* --- execute the rest request to post the new event in the MS Graph API --- */
+                restClient.BaseUrl = new Uri($"https://graph.microsoft.com/v1.0/users/{masterUserId.SourceEntityId}/events/{masterEventId.SourceEntityId}");
+                var response = restClient.Patch(restRequest);
+
+                Console.WriteLine(response.StatusCode);
+
+                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    masterDBService.ChangeEntityVersion(rabbitMQEvent.UUID);
+                }
+            }
         }
 
 
@@ -301,7 +358,23 @@ namespace Office365Service
         /// <param name="rabbitMQEvent">Deleted event sent by the RabbitMQ message broker</param>
         public void EventDelete(RabbitMQEvent rabbitMQEvent)
         {
-            Console.WriteLine("Delete van Event nog niet klaar!");
+            //Console.WriteLine("Delete van Event nog niet klaar!");
+            Master masterUserId = masterDBService.GetGraphIdFromMUUID(rabbitMQEvent.OrganiserId);
+            Master masterEventId = masterDBService.GetGraphIdFromMUUID(rabbitMQEvent.UUID);
+
+            if (masterEventId != null && masterUserId != null && masterDBService.CheckSourceEntityVersionIsHigher(rabbitMQEvent.UUID, rabbitMQEvent.Header.Source))
+            {
+                RestClient restClient = new RestClient();
+                RestRequest restRequest = new RestRequest();
+                BearerToken = RefreshAccesToken();
+
+                restRequest.AddHeader("Authorization", BearerToken.Token_type + " " + BearerToken.Access_token);
+                Console.WriteLine(rabbitMQEvent.UUID);
+                restClient.BaseUrl = new Uri($"https://graph.microsoft.com/v1.0/users/{masterUserId.SourceEntityId}/events/{masterEventId.SourceEntityId}");
+                var response = restClient.Delete(restRequest);
+
+                Console.WriteLine(response.StatusCode);
+            }
         }
      
 
@@ -340,10 +413,10 @@ namespace Office365Service
         public void UserCreate(RabbitMQUser rabbitMQUser)
         {
             //Mock data om nieuw user aan te maken
-            rabbitMQUser = new RabbitMQUser();
-            rabbitMQUser.FirstName = "Steve";
-            rabbitMQUser.LastName = "Herman";
-            rabbitMQUser.Role = "Clown";
+            //rabbitMQUser = new RabbitMQUser();
+            //rabbitMQUser.FirstName = "Steve";
+            //rabbitMQUser.LastName = "Herman";
+            //rabbitMQUser.Role = "Clown";
 
             RestClient restClient = new RestClient();
             RestRequest restRequest = new RestRequest();
@@ -373,6 +446,14 @@ namespace Office365Service
             var response = restClient.Post(restRequest);
 
             Console.WriteLine(response.StatusCode);
+
+            if (response.StatusCode == System.Net.HttpStatusCode.Created)
+            {
+                var responsJson = response.Content;
+                User responseUser = JsonConvert.DeserializeObject<User>(responsJson);
+                Console.WriteLine(responseUser.Id);
+                masterDBService.CreateEntity(rabbitMQUser.UUID, responseUser.Id, "User");
+            }
         }
 
 
@@ -382,7 +463,45 @@ namespace Office365Service
         /// <param name="rabbitMQUser">Updated user sent by the RabbitMQ message broker</param>
         public void UserUpdate(RabbitMQUser rabbitMQUser)
         {
-            Console.WriteLine("Update van User nog niet klaar!");
+            //Console.WriteLine("Update van User nog niet klaar!");
+            Master masterUserId = masterDBService.GetGraphIdFromMUUID(rabbitMQUser.UUID);
+            if (masterUserId != null && masterDBService.CheckSourceEntityVersionIsHigher(rabbitMQUser.UUID, rabbitMQUser.Header.Source))
+            {
+                RestClient restClient = new RestClient();
+                RestRequest restRequest = new RestRequest();
+
+                User user = new User();
+                //required
+                user.AccountEnabled = true;
+                user.DisplayName = rabbitMQUser.FirstName + " " + rabbitMQUser.LastName;
+                user.MailNickname = rabbitMQUser.FirstName.Replace(' ', '.') + "." + rabbitMQUser.LastName;
+                user.UserPrincipalName = user.MailNickname + "@ipwt3.onmicrosoft.com";
+                user.PasswordProfile = new UserPasswordProfile();
+                user.PasswordProfile.ForceChangePasswordNextSignIn = false;
+                user.PasswordProfile.Password = Constant.StandardPassword;
+
+                user.GivenName = rabbitMQUser.FirstName;
+                user.SurName = rabbitMQUser.LastName;
+                user.JobTitle = rabbitMQUser.Role;
+
+                BearerToken = RefreshAccesToken();
+
+                var json = JsonConvert.SerializeObject(user);
+                restRequest.AddHeader("Authorization", BearerToken.Token_type + " " + BearerToken.Access_token);
+                restRequest.AddJsonBody(json);
+                Console.WriteLine(json);
+
+                restClient.BaseUrl = new Uri($"https://graph.microsoft.com/v1.0/users/{masterUserId.SourceEntityId}");
+                Console.WriteLine(restClient.BaseUrl);
+                var response = restClient.Patch(restRequest);
+
+                Console.WriteLine(response.StatusCode);
+
+                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    masterDBService.ChangeEntityVersion(rabbitMQUser.UUID);
+                }
+            }
         }
 
 
@@ -392,14 +511,15 @@ namespace Office365Service
         /// <param name="rabbitMQUser">Deleted user sent by the RabbitMQ message broker</param>
         public void UserDelete(RabbitMQUser rabbitMQUser)
         {
-            Console.WriteLine("Delete van User nog niet klaar!");
+            //Console.WriteLine("Delete van User nog niet klaar!");
+            Master masterUserId = masterDBService.GetGraphIdFromMUUID(rabbitMQUser.UUID);
             RestClient restClient = new RestClient();
             RestRequest restRequest = new RestRequest();
             BearerToken = RefreshAccesToken();
 
             restRequest.AddHeader("Authorization", BearerToken.Token_type + " " + BearerToken.Access_token);
             Console.WriteLine(rabbitMQUser.UUID);
-            restClient.BaseUrl = new Uri($"https://graph.microsoft.com/v1.0/users/{rabbitMQUser.UUID}");
+            restClient.BaseUrl = new Uri($"https://graph.microsoft.com/v1.0/users/{masterUserId.SourceEntityId}");
             var response = restClient.Delete(restRequest);
 
             Console.WriteLine(response.StatusCode);
@@ -424,5 +544,15 @@ namespace Office365Service
             return ConvertObjectToXML(heartBeat);
         }
 
+        public void test()
+        {
+            var service = new MasterDBServices();
+            //XMLSource source = XMLSource.FRONTEND;
+            //Guid uuid = new Guid("f9daab25-bccd-11eb-b876-00155d110504");
+            //string uuid = new Guid("a3ec8291-bcd1-11eb-b876-00155d110504");
+            string uuid = service.GetMUUID().ToString();
+            service.CreateEntity(new Guid(uuid), "Test", "EVENT");
+            //masterDBService.GetGraphIdFromMUUID(uuid);
+        }
     }
 }  /* ---  --- */
