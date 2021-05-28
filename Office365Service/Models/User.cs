@@ -29,9 +29,9 @@ namespace Office365Service.Models
         public string[] BusinessPhones {
             get
             {
-                return businessPhonesValue; 
-            } 
-            set 
+                return businessPhonesValue;
+            }
+            set
             {
                 businessPhonesValue = value;
             }
@@ -46,5 +46,7 @@ namespace Office365Service.Models
         public object PreferredLanguage { get; set; }
         [JsonProperty("id")]
         public string Id { get; set; }
+        [JsonProperty("usageLocation")]
+        public string UsageLocation { get; set; }
     }
 }

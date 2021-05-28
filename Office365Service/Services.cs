@@ -258,7 +258,7 @@ namespace Office365Service
                 calendarEvent.Body.Content = rabbitMQEvent.Description;
                 //calendarEvent.Organizer = new CalendarEventOrganizer();
                 //calendarEvent.Organizer.EmailAddress = new CalendarEventEmailAddress();
-                calendarEvent.Organizer.EmailAddress.Address = rabbitMQEvent.OrganiserId.ToString();
+                calendarEvent.Organizer.EmailAddress.Address = GetEmailFromUUID(masterUserId.SourceEntityId);
                 //calendarEvent.Location = new CalendarEventLocation();
                 //calendarEvent.Location.Address = new CalendarEventLocationAddress();
                 //calendarEvent.Location.DisplayName = rabbitMQEvent.Location;
@@ -427,9 +427,11 @@ namespace Office365Service
             user.DisplayName = rabbitMQUser.FirstName + " " + rabbitMQUser.LastName;
             user.MailNickname = rabbitMQUser.FirstName.Replace(' ', '.') + "." + rabbitMQUser.LastName;
             user.UserPrincipalName = user.MailNickname + "@ipwt3.onmicrosoft.com";
+            user.Mail = user.UserPrincipalName;
             user.PasswordProfile = new UserPasswordProfile();
             user.PasswordProfile.ForceChangePasswordNextSignIn = false;
             user.PasswordProfile.Password = Constant.StandardPassword;
+            user.UsageLocation = "BE";
 
             user.GivenName = rabbitMQUser.FirstName;
             user.SurName = rabbitMQUser.LastName;
@@ -449,9 +451,26 @@ namespace Office365Service
 
             if (response.StatusCode == System.Net.HttpStatusCode.Created)
             {
-                var responsJson = response.Content;
-                User responseUser = JsonConvert.DeserializeObject<User>(responsJson);
+                GraphLicense licenses = new GraphLicense();
+                GraphLicenseAddLicense license = new GraphLicenseAddLicense();
+                license.SkuId = Constant.M365Lisence;
+                licenses.AddLicenses.Add(license);
+                var jsonlicense = JsonConvert.SerializeObject(licenses);
+                
+                var responseJson = response.Content;
+                User responseUser = JsonConvert.DeserializeObject<User>(responseJson);
                 Console.WriteLine(responseUser.Id);
+                Console.WriteLine(jsonlicense);
+                
+                RestClient restClientLicense = new RestClient();
+                RestRequest restRequestLicense = new RestRequest();
+                restRequestLicense.AddHeader("Authorization", BearerToken.Token_type + " " + BearerToken.Access_token);
+                restRequestLicense.AddJsonBody(jsonlicense);
+                restClientLicense.BaseUrl = new Uri($"https://graph.microsoft.com/v1.0/users/{responseUser.Id}/assignLicense");
+                var responseLicense = restClientLicense.Post(restRequestLicense);
+                Console.WriteLine(responseLicense.StatusCode);
+                Console.WriteLine(responseLicense.ErrorMessage);
+                
                 masterDBService.CreateEntity(rabbitMQUser.UUID, responseUser.Id, "User");
             }
         }
@@ -476,9 +495,10 @@ namespace Office365Service
                 user.DisplayName = rabbitMQUser.FirstName + " " + rabbitMQUser.LastName;
                 user.MailNickname = rabbitMQUser.FirstName.Replace(' ', '.') + "." + rabbitMQUser.LastName;
                 user.UserPrincipalName = user.MailNickname + "@ipwt3.onmicrosoft.com";
-                user.PasswordProfile = new UserPasswordProfile();
-                user.PasswordProfile.ForceChangePasswordNextSignIn = false;
-                user.PasswordProfile.Password = Constant.StandardPassword;
+                user.UsageLocation = "BE";
+                //user.PasswordProfile = new UserPasswordProfile();
+                //user.PasswordProfile.ForceChangePasswordNextSignIn = false;
+                //user.PasswordProfile.Password = Constant.StandardPassword;
 
                 user.GivenName = rabbitMQUser.FirstName;
                 user.SurName = rabbitMQUser.LastName;
@@ -497,7 +517,7 @@ namespace Office365Service
 
                 Console.WriteLine(response.StatusCode);
 
-                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
                 {
                     masterDBService.ChangeEntityVersion(rabbitMQUser.UUID);
                 }

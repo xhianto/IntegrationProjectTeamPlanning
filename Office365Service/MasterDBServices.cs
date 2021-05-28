@@ -75,7 +75,8 @@ namespace Office365Service
                 Master master = (from m in db.Master
                                  where m.Uuid == muuid.ToByteArray() && m.Source == XMLSource.PLANNING.ToString()
                                  select m).FirstOrDefault();
-                master.EntityVersion += 1;
+                master.EntityVersion++;
+                Console.WriteLine("Entity Version: " + master.EntityVersion);
                 db.SaveChanges();
             }
         }
