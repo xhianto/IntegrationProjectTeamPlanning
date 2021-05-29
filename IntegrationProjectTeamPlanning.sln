@@ -11,9 +11,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RabbitMQUserConsumer", "Rab
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RabbitMQHeartBeatProducer", "RabbitMQHeartBeatProducer\RabbitMQHeartBeatProducer.csproj", "{F0A793DD-F7BF-4102-82E3-217C27CB5DE8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMQEventConsumer", "RabbitMQEventConsumer\RabbitMQEventConsumer.csproj", "{5F0B72A1-B1A8-4445-ACD3-7A7365F374C6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RabbitMQEventConsumer", "RabbitMQEventConsumer\RabbitMQEventConsumer.csproj", "{5F0B72A1-B1A8-4445-ACD3-7A7365F374C6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMQEventProducer", "RabbitMQEventProducer\RabbitMQEventProducer.csproj", "{6982D6AC-3143-4A1E-8225-080D0294274C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RabbitMQEventProducer", "RabbitMQEventProducer\RabbitMQEventProducer.csproj", "{6982D6AC-3143-4A1E-8225-080D0294274C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMQFinalProduct", "RabbitMQFinalProduct\RabbitMQFinalProduct.csproj", "{2EBB224D-54E1-4EA1-85D6-708726C7101E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{6982D6AC-3143-4A1E-8225-080D0294274C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6982D6AC-3143-4A1E-8225-080D0294274C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6982D6AC-3143-4A1E-8225-080D0294274C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2EBB224D-54E1-4EA1-85D6-708726C7101E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2EBB224D-54E1-4EA1-85D6-708726C7101E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2EBB224D-54E1-4EA1-85D6-708726C7101E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2EBB224D-54E1-4EA1-85D6-708726C7101E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

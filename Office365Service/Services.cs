@@ -121,6 +121,38 @@ namespace Office365Service
             return email;
         }
 
+        public User GetUserFromUUID(string uuid)
+        {
+            User user = new User();
+            RestClient restClient = new RestClient();
+            RestRequest restRequest = new RestRequest();
+            BearerToken = RefreshAccesToken();
+
+            SetRestRequestHeader(restRequest);
+
+            restClient.BaseUrl = new Uri($"https://graph.microsoft.com/v1.0/users/{uuid}");
+            var response = restClient.Get(restRequest);
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                //Console.WriteLine(response.Content);
+
+                // convert the JSON response from the MS Graph API to a User instance 
+                user = JsonConvert.DeserializeObject<User>(response.Content);
+            }
+            return user;
+        }
+
+        //public CalendarEvent GetEventFromUUID(string uuid)
+        //{
+        //    CalendarEvent calendarEvent = new CalendarEvent();
+        //    RestClient restClient = new RestClient();
+        //    RestRequest restRequest = new RestRequest();
+        //    BearerToken = RefreshAccesToken();
+
+        //    SetRestRequestHeader(restRequest);
+
+        //    restClient.
+        //}
 
         /// <summary>
         /// Method for converting any type of object to an xml string
@@ -264,7 +296,7 @@ namespace Office365Service
                 //calendarEvent.Location.DisplayName = rabbitMQEvent.Location;
                 string[] location = rabbitMQEvent.Location.Split('%');
                 calendarEvent.Location.Address.Street = location[0] + " " + location[1] + " " + location[2];
-                calendarEvent.Location.Address.City = location[3];
+                calendarEvent.Location.Address.City = location[3]; 
                 calendarEvent.Location.Address.PostalCode = location[4];
 
 
