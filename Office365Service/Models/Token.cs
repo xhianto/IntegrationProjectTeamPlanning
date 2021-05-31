@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Text;
 using Newtonsoft.Json;
 
+namespace Office365Service.Models
+{
 /// <summary>
 /// Model Class to handle an Bearor Token, used for authenticating to the MS Graph API. 
 /// </summary>
-namespace Office365Service.Models
-{
     public class Token
     {
         [JsonProperty("token_type")]

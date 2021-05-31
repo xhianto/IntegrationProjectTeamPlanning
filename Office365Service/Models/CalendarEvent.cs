@@ -4,7 +4,7 @@ using System.Text;
 using Newtonsoft.Json;
 
 namespace Office365Service.Models
-
+{ 
         /// <summary>
         /// Model Class to store an event. 
         /// Attributes can be send to MS Graph API using the annotated Json properties.

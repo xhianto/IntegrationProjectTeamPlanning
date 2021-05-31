@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml.Serialization;
 
+namespace Office365Service.Models
+{
 /// <summary>
 /// Model Class to send an event. 
 /// Attributes can be send to RabbitMQ using the annotated XML properties.
 /// </summary>
-namespace Office365Service.Models
-{
     [Serializable, XmlRoot(ElementName = "event")]
     public class RabbitMQEvent
     {

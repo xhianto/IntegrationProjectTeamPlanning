@@ -8,6 +8,9 @@ using RabbitMQ.Client;
 
 namespace RabbitMQFinalProduct
 { 
+    /// <summary>
+    /// Publish heartbeats of the system.
+    /// </summary>
     public class HeartBeat
     {
         public void sendHeartBeat(object source, ElapsedEventArgs e)

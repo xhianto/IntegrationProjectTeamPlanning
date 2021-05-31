@@ -9,6 +9,9 @@ using System.Text;
 using System.Timers;
 using System.Xml.Serialization;
 
+/// <summary>
+/// Main class, sending system heartbeat and consuming changes in the event, attendees and user queues on the connected RabbitMQ messaging system.
+/// </summary>
 namespace RabbitMQFinalProduct
 {
     class Program

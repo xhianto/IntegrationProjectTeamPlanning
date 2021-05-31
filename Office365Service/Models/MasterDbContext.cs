@@ -6,11 +6,11 @@ using Microsoft.EntityFrameworkCore.Metadata;
 // If you have enabled NRTs for your project, then un-comment the following line:
 // #nullable disable
 
+namespace Office365Service.Models
+{
 /// <summary>
 /// Service creating the muuid table.
 /// </summary>
-namespace Office365Service.Models
-{
     public class MasterDbContext : DbContext
     {
         public MasterDbContext()
