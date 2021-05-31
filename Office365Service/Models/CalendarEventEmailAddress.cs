@@ -5,6 +5,9 @@ using Newtonsoft.Json;
 
 namespace Office365Service.Models
 {
+    /// <summary>
+    /// Model Class to store  . 
+    /// </summary>
     public class CalendarEventEmailAddress
     {
         [JsonProperty("name")]

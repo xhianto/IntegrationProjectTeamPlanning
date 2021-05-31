@@ -4,8 +4,11 @@ using System.Text;
 using Newtonsoft.Json;
 
 namespace Office365Service.Models
-{
-    public class CalendarEvent
+
+        /// <summary>
+        /// Model Class to store an event. 
+        /// </summary>
+public class CalendarEvent
     {
         public CalendarEvent()
         {

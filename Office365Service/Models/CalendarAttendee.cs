@@ -5,6 +5,9 @@ using Newtonsoft.Json;
 
 namespace Office365Service.Models
 {
+    /// <summary>
+    /// Model Class to store the attendees of en event. 
+    /// </summary>
     public class CalendarAttendees
     {
         public CalendarAttendees()
