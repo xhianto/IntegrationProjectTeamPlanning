@@ -6,6 +6,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="bin\Debug\netcoreapp3.1\XMLvalidations\attendance.xsd" />
+    <None Include="bin\Debug\netcoreapp3.1\XMLvalidations\event.xsd" />
+    <None Include="bin\Debug\netcoreapp3.1\XMLvalidations\heartbeat.xsd" />
+    <None Include="bin\Debug\netcoreapp3.1\XMLvalidations\user.xsd" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.15">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

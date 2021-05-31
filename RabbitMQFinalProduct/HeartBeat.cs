@@ -23,9 +23,12 @@ namespace RabbitMQFinalProduct
             using var channel = connection.CreateModel();
             
             string xmlString = services.getHeartBeat();
-            Console.WriteLine(xmlString);
-            var xml = Encoding.UTF8.GetBytes(xmlString);
-            channel.BasicPublish("", Constant.RabbitMQHeartBeatName, null, xml);
+            //Console.WriteLine(xmlString);
+            if (services.XSDValidatie(xmlString, "heartbeat"))
+            {
+                var xml = Encoding.UTF8.GetBytes(xmlString);
+                channel.BasicPublish("", Constant.RabbitMQHeartBeatName, null, xml);
+            }
         }
     }
 }

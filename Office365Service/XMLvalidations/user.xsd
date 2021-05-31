@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-    <xs:element name="event">
+    <xs:element name="user">
         <xs:complexType>
-            <xs:sequence> 
+            <xs:sequence>
               <xs:element name="header">
                     <xs:complexType>
                         <xs:sequence>
@@ -27,7 +27,7 @@
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>
-                <xs:element name="uuid">
+                <xs:element name="uuid" minOccurs="1" nillable="false">
                     <xs:simpleType>
                         <xs:restriction base="xs:string">
                             <xs:pattern value="[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}"/>
@@ -35,36 +35,37 @@
                     </xs:simpleType>
                 </xs:element>
                 <xs:element name="entityVersion" type="xs:int"/>
-                <xs:element name="title">
+                <xs:element name="lastName" minOccurs="1" nillable="false">
                     <xs:simpleType>
                         <xs:restriction base="xs:string">
                             <xs:maxLength value="60" />
+                            <xs:pattern value="^(?!\s*$).+" />
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:element>                        
-                <xs:element name="organiserId">
+                <xs:element name="firstName" minOccurs="1" nillable="false">
                     <xs:simpleType>
                         <xs:restriction base="xs:string">
-                            <xs:pattern value="[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}"/>
+                            <xs:maxLength value="60" />
+                            <xs:pattern value="^(?!\s*$).+" />
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:element>
-                <xs:element name="description" minOccurs="0">
+                <xs:element name="emailAddress" minOccurs="1" nillable="false">                                
                     <xs:simpleType>
                         <xs:restriction base="xs:string">
-                            <xs:maxLength value="240" />
+                            <xs:pattern value="([0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*@([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,9})"/>
                         </xs:restriction>
                     </xs:simpleType>
-                </xs:element>  
-                <xs:element name="start" type="xs:dateTime"/>     
-                <xs:element name="end" type="xs:dateTime" minOccurs="0"/>      
-                <xs:element name="location">
+                </xs:element>                            
+                <xs:element name="role">
                     <xs:simpleType>
                         <xs:restriction base="xs:string">
-                            <xs:maxLength value="512" />
+                            <xs:enumeration value="student" />
+                            <xs:enumeration value="lecturer" />
                         </xs:restriction>
                     </xs:simpleType>
-                </xs:element>                   
+                </xs:element>
             </xs:sequence>
         </xs:complexType>
     </xs:element>

@@ -40,75 +40,81 @@ namespace RabbitMQFinalProduct
             var userConsumer = new EventingBasicConsumer(channel);
             var attendanceConsumer = new EventingBasicConsumer(channel);
 
+            // User
+            userConsumer.Received += (sender, e) =>
+            {
+
+                var message = e.Body.ToArray();
+                var xml = Encoding.UTF8.GetString(message);
+                Console.WriteLine(xml);
+                if (OfficeService.XSDValidatie(xml, "user"))
+                {
+                    XmlSerializer serializer = new XmlSerializer(typeof(RabbitMQUser));
+                    using (TextReader reader = new StringReader(xml))
+                    {
+                        RabbitMQUser result = (RabbitMQUser)serializer.Deserialize(reader);
+                        Console.WriteLine(result.Header.Method);
+                        Console.WriteLine(result.Header.Source);
+                        Console.WriteLine(result.UUID);
+                        Console.WriteLine(result.EntityVersion);
+                        Console.WriteLine(result.LastName);
+                        Console.WriteLine(result.FirstName);
+                        Console.WriteLine(result.EmailAddress);
+                        Console.WriteLine(result.Role);
+                        if (result.Header.Source != XMLSource.PLANNING)
+                        {
+                            switch (result.Header.Method)
+                            {
+                                case XMLMethod.CREATE:
+                                    OfficeService.UserCreate(result);
+                                    break;
+                                case XMLMethod.UPDATE:
+                                    OfficeService.UserUpdate(result);
+                                    break;
+                                case XMLMethod.DELETE:
+                                    OfficeService.UserDelete(result);
+                                    break;
+                            }
+                        }
+                    }
+                }
+            };
+
             //Event
             eventConsumer.Received += (sender, e) =>
             {
                 var message = e.Body.ToArray();
                 var xml = Encoding.UTF8.GetString(message);
                 Console.WriteLine(xml);
-                XmlSerializer serializer = new XmlSerializer(typeof(RabbitMQEvent));
-                using (TextReader reader = new StringReader(xml))
+                if (OfficeService.XSDValidatie(xml, "event"))
                 {
-                    RabbitMQEvent result = (RabbitMQEvent)serializer.Deserialize(reader);
-                    Console.WriteLine(result.Header.Method);
-                    Console.WriteLine(result.Header.Source);
-                    Console.WriteLine(result.UUID);
-                    Console.WriteLine(result.EntityVersion);
-                    Console.WriteLine(result.Title);
-                    Console.WriteLine(result.OrganiserId);
-                    Console.WriteLine(result.Description);
-                    Console.WriteLine(result.Start);
-                    Console.WriteLine(result.End);
-                    if (result.Header.Source != XMLSource.PLANNING)
+                    XmlSerializer serializer = new XmlSerializer(typeof(RabbitMQEvent));
+                    using (TextReader reader = new StringReader(xml))
                     {
-                        switch (result.Header.Method)
+                        RabbitMQEvent result = (RabbitMQEvent)serializer.Deserialize(reader);
+                        Console.WriteLine(result.Header.Method);
+                        Console.WriteLine(result.Header.Source);
+                        Console.WriteLine(result.UUID);
+                        Console.WriteLine(result.EntityVersion);
+                        Console.WriteLine(result.Title);
+                        Console.WriteLine(result.OrganiserId);
+                        Console.WriteLine(result.Description);
+                        Console.WriteLine(result.Start);
+                        Console.WriteLine(result.End);
+                        if (result.Header.Source != XMLSource.PLANNING)
                         {
-                            case XMLMethod.CREATE:
-                                OfficeService.EventCreate(result);
-                                break;
-                            case XMLMethod.UPDATE:
-                                OfficeService.EventUpdate(result);
-                                break;
-                            case XMLMethod.DELETE:
-                                OfficeService.EventDelete(result);
-                                break;
-                        }
-                    }
-                }
-            };
-
-            // User
-            userConsumer.Received += (sender, e) =>
-            {
-                
-                var message = e.Body.ToArray();
-                var xml = Encoding.UTF8.GetString(message);
-                Console.WriteLine(xml);
-                XmlSerializer serializer = new XmlSerializer(typeof(RabbitMQUser));
-                using (TextReader reader = new StringReader(xml))
-                {
-                    RabbitMQUser result = (RabbitMQUser)serializer.Deserialize(reader);
-                    Console.WriteLine(result.Header.Method);
-                    Console.WriteLine(result.Header.Source);
-                    Console.WriteLine(result.UUID);
-                    Console.WriteLine(result.EntityVersion);
-                    Console.WriteLine(result.LastName);
-                    Console.WriteLine(result.FirstName);
-                    Console.WriteLine(result.EmailAddress);
-                    Console.WriteLine(result.Role);
-                    if (result.Header.Source != XMLSource.PLANNING)
-                    {
-                        switch (result.Header.Method)
-                        {
-                            case XMLMethod.CREATE:
-                                OfficeService.UserCreate(result);
-                                break;
-                            case XMLMethod.UPDATE:
-                                OfficeService.UserUpdate(result);
-                                break;
-                            case XMLMethod.DELETE:
-                                OfficeService.UserDelete(result);
-                                break;
+                            switch (result.Header.Method)
+                            {
+                                case XMLMethod.CREATE:
+                                    OfficeService.EventCreate(result);
+                                    break;
+                                case XMLMethod.UPDATE:
+                                    OfficeService.EventUpdate(result);
+                                    break;
+                                case XMLMethod.DELETE:
+                                    OfficeService.EventDelete(result);
+                                    break;
+                            }
                         }
                     }
                 }
@@ -121,23 +127,26 @@ namespace RabbitMQFinalProduct
                 var message = e.Body.ToArray();
                 var xml = Encoding.UTF8.GetString(message);
                 Console.WriteLine(xml);
-                XmlSerializer serializer = new XmlSerializer(typeof(RabbitMQAttendance));
-                using (TextReader reader = new StringReader(xml))
+                if (OfficeService.XSDValidatie(xml, "attendance"))
                 {
-                    RabbitMQAttendance result = (RabbitMQAttendance)serializer.Deserialize(reader);
-                    Console.WriteLine(result.Header.Method);
-                    Console.WriteLine(result.UUID);
-                    Console.WriteLine(result.UserId);
-                    Console.WriteLine(result.EventId);
-                    switch (result.Header.Method)
+                    XmlSerializer serializer = new XmlSerializer(typeof(RabbitMQAttendance));
+                    using (TextReader reader = new StringReader(xml))
                     {
-                        case XMLMethod.CREATE:
-                            attendanceService.AttendanceCreate(result);
-                            break;
+                        RabbitMQAttendance result = (RabbitMQAttendance)serializer.Deserialize(reader);
+                        Console.WriteLine(result.Header.Method);
+                        Console.WriteLine(result.UUID);
+                        Console.WriteLine(result.UserId);
+                        Console.WriteLine(result.EventId);
+                        switch (result.Header.Method)
+                        {
+                            case XMLMethod.CREATE:
+                                attendanceService.AttendanceCreate(result);
+                                break;
 
-                        case XMLMethod.DELETE:
-                            attendanceService.AttendanceDelete(result);
-                            break;
+                            case XMLMethod.DELETE:
+                                attendanceService.AttendanceDelete(result);
+                                break;
+                        }
                     }
                 }
             };

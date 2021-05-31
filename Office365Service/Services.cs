@@ -5,6 +5,8 @@ using System;
 using System.IO;
 using System.Text;
 using System.Xml;
+using System.Xml.Linq;
+using System.Xml.Schema;
 using System.Xml.Serialization;
 
 namespace Office365Service
@@ -592,7 +594,7 @@ namespace Office365Service
             heartBeat.Header.Status = XMLStatus.ONLINE;
             heartBeat.Header.Source = XMLSource.PLANNING;
             heartBeat.TimeStamp = DateTime.Now;
-
+            Console.Write("Heartbeat made at: " + heartBeat.TimeStamp + ": ");
             return ConvertObjectToXML(heartBeat);
         }
 
@@ -605,6 +607,23 @@ namespace Office365Service
             string uuid = service.GetMUUID().ToString();
             service.CreateEntity(new Guid(uuid), "Test", "EVENT");
             //masterDBService.GetGraphIdFromMUUID(uuid);
+        }
+
+        public bool XSDValidatie(string xml, string xsd) //geef xml string en welk xsd bestand je wilt gebruiken bvb "event.xsd"
+        {
+            XmlSchemaSet xmlSchema = new XmlSchemaSet();
+            xmlSchema.Add("", Environment.CurrentDirectory + "/XMLvalidations/" + xsd + ".xsd");
+            bool xmlValidation = true;
+
+            XDocument doc = XDocument.Parse(xml);
+
+            doc.Validate(xmlSchema, (sender, args) =>
+            {
+                Console.WriteLine("Error Message: " + args.Message);
+                xmlValidation = false;
+            });
+            Console.WriteLine("XmlValidatie voor " + xsd + ": " + xmlValidation);
+            return xmlValidation;
         }
     }
 }  /* ---  --- */
