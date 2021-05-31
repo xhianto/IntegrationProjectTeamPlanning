@@ -7,7 +7,7 @@ namespace Office365Service.Models
 {
     /// <summary>
     /// Model Class to store name and emailaddress of an attendee, stored in an CalendarAttendee instance. 
-    /// Attributesan be send to MS Graph API according as Json properties.
+    /// Attributes can be send to MS Graph API using the annotated Json properties.
     /// </summary>
     public class CalendarAttendeeEmail
     {

@@ -7,6 +7,7 @@ namespace Office365Service.Models
 {
     /// <summary>
     /// Model Class to store the attendees of en event. 
+    /// Attributes can be send to MS Graph API using the annotated Json properties.
     /// </summary>
     public class CalendarAttendees
     {

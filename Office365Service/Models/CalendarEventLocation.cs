@@ -5,6 +5,10 @@ using Newtonsoft.Json;
 
 namespace Office365Service.Models
 {
+    /// <summary>
+    /// Model Class to store the name of the location of an event, stored in an CalendarEvent instance. 
+    /// Attributes can be send to MS Graph API using the annotated Json properties.
+    /// </summary>
     public class CalendarEventLocation
     {
         public CalendarEventLocation()
