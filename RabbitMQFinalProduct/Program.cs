@@ -16,9 +16,12 @@ namespace RabbitMQFinalProduct
 {
     class Program
     {
+        /* --- Instatiate the Services --- */
         private static Services OfficeService = new Services();
+
         static void Main(string[] args)
         {
+            /* --- Instatiate timer and trigger sendHeartbeat every second --- */
             HeartBeat heartBeat = new HeartBeat();
 
             Timer timer = new Timer();
@@ -26,7 +29,10 @@ namespace RabbitMQFinalProduct
             timer.Interval = 1000;
             timer.Start();
 
+            /* --- Instatiate List of CalendarEvents --- */
             List<CalendarEvent> events = new List<CalendarEvent>();
+
+            /* --- Instatiate connection with RabbitMQ --- */
             Uri rabbitMQUri = new Uri(Constant.RabbitMQConnectionUrl);
             string queueEventName = Constant.RabbitMQEventQueueName;
             string queueUserName = Constant.RabbitMQUserQueueName;
@@ -39,10 +45,13 @@ namespace RabbitMQFinalProduct
             using var connection = factory.CreateConnection();
             using var channel = connection.CreateModel();
 
+            /* --- Instatiate consumer for event, user & attendance queue --- */
             var eventConsumer = new EventingBasicConsumer(channel);
             var userConsumer = new EventingBasicConsumer(channel);
             var attendanceConsumer = new EventingBasicConsumer(channel);
-
+            
+            
+            /* --- Execute valid User changes (create, dupdate, delete) from other systems (Canvas, Frontend) )--- */
             // User
             userConsumer.Received += (sender, e) =>
             {
@@ -83,6 +92,7 @@ namespace RabbitMQFinalProduct
                 }
             };
 
+            /* --- Execute valid Event changes (create, dupdate, delete) from other systems (Canvas, Frontend) --- */
             //Event
             eventConsumer.Received += (sender, e) =>
             {
@@ -123,6 +133,7 @@ namespace RabbitMQFinalProduct
                 }
             };
 
+            /* --- Execute valid Attendance changes (create, delete) from other systems (Canvas, Frontend) --- */
             //Attendance
             attendanceConsumer.Received += (sender, e) =>
             {
@@ -155,6 +166,7 @@ namespace RabbitMQFinalProduct
             };
 
 
+            /* --- Consume the event, user & attendance queues --- */
             channel.BasicConsume(queueUserName, true, userConsumer);
             channel.BasicConsume(queueEventName, true, eventConsumer);
             channel.BasicConsume(queueAttendanceName, true, attendanceConsumer);
