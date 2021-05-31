@@ -6,11 +6,11 @@ using System.Linq;
 using MySqlConnector;
 using MySql.Data.MySqlClient;
 
+namespace Office365Service
+{
 /// <summary>
 /// Service for connecting with the Master DB which handles the MUUID's. 
 /// </summary>
-namespace Office365Service
-{
     public class MasterDBServices
     {
         //Get MUUID

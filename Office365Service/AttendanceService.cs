@@ -6,11 +6,12 @@ using RestSharp;
 using Newtonsoft.Json;
 using System.Linq;
 
+namespace Office365Service
+{
+
 /// <summary>
 /// Service handling attendances to events in the MS Graph API
 /// </summary>
-namespace Office365Service
-{
     public class AttendanceService
     {
         Services services = new Services();
