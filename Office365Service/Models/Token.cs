@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using Newtonsoft.Json;
 
+/// <summary>
+/// Model Class to handle an Bearor Token, used for authenticating to the MS Graph API. 
+/// </summary>
 namespace Office365Service.Models
 {
     public class Token
