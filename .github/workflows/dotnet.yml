@@ -36,5 +36,9 @@ jobs:
 #    - name: run finalproduct
 #      run: C:\actions-runner\_work\Planning\Planning\RabbitMQFinalProduct\bin\Debug\netcoreapp3.1\RabbitMQFinalProduct.exe
 #      shell: powershell -command "& '{0}'"
-    - name: Dotnet Publish
-      run: dotnet publish src -c Release -o deploy
+#    - name: Dotnet Publish
+#      run: dotnet publish src -c Release -o deploy
+    - name: add vpn connection
+      run: Add-VpnConnection -Name "EhB" -ServerAddress "dtsslvpn.ehb.be" -TunnelType "Sstp" -EncryptionLevel "Optional" -AuthenticationMethod Eap -Force -RememberCredential -PassThru
+    - name: connect to vpn
+      run: rasdial ehb  ${{secrets.VPN}}
