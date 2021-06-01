@@ -21,6 +21,7 @@ namespace Office365Service
 
         public Token BearerToken = new Token();
         private MasterDBServices masterDBService = new MasterDBServices();
+        private XmlController xmlController = new XmlController();
 
         /// <summary>
         /// Method for getting and staying authenticated on MS
@@ -48,7 +49,6 @@ namespace Office365Service
                     {
                         BearerToken = JsonConvert.DeserializeObject<Token>(response.Content);
                         BearerToken.TimeStamp = DateTime.Now;
-                        Console.WriteLine(BearerToken.Token_type);
                         Console.WriteLine(response.Content);
                     }
                 }
@@ -157,31 +157,7 @@ namespace Office365Service
         //    restClient.
         //}
 
-        /// <summary>
-        /// Method for converting any type of object to an xml string
-        /// </summary>
-        /// <typeparam name="T">Generic type</typeparam>
-        /// <param name="obj">Generic object</param>
-        /// <returns></returns>
-        public string ConvertObjectToXML<T>(T obj)
-        {
-            string xml = "";
-            try
-            {
-                MemoryStream mStream = new MemoryStream();
-                XmlSerializer serializer = new XmlSerializer(typeof(T));
-                XmlTextWriter writer = new XmlTextWriter(mStream, null);
-                writer.Formatting = System.Xml.Formatting.Indented;
-                serializer.Serialize(writer, obj);
-                xml = Encoding.UTF8.GetString(mStream.ToArray());
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            return xml;
-        }
+        
 
 
 
@@ -213,7 +189,7 @@ namespace Office365Service
 
             string straat = ConcatStreetNrAndBus(calendarEvent);
             rabbitMQEvent.Location = straat + "%" + calendarEvent.Location.Address.City + "%" + calendarEvent.Location.Address.PostalCode;
-            return ConvertObjectToXML(rabbitMQEvent);
+            return xmlController.ConvertObjectToXML(rabbitMQEvent);
         }
 
 
@@ -282,7 +258,7 @@ namespace Office365Service
             rabbitMQUser.FirstName = user.GivenName;
             rabbitMQUser.EmailAddress = user.UserPrincipalName;
             rabbitMQUser.Role = "Student";
-            return ConvertObjectToXML(rabbitMQUser);
+            return xmlController.ConvertObjectToXML(rabbitMQUser);
         }
 
         
@@ -302,7 +278,7 @@ namespace Office365Service
             heartBeat.Header.Source = XMLSource.PLANNING;
             heartBeat.TimeStamp = DateTime.Now;
             Console.Write("Heartbeat made at: " + heartBeat.TimeStamp + ": ");
-            return ConvertObjectToXML(heartBeat);
+            return xmlController.ConvertObjectToXML(heartBeat);
         }
 
         public void test()

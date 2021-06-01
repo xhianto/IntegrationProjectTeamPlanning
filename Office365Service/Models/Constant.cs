@@ -15,8 +15,8 @@ namespace Office365Service.Models
         public const string M365Lisence = "c42b9cae-ea4f-4ab7-9717-81576235ccac";
 
         // Constants of RabbitMQ
-        public const string RabbitMQConnectionUrl = "amqp://guest:guest@10.3.17.66:5671";
-        //public const string RabbitMQConnectionUrl = "amqp://guest:guest@10.3.17.61:5672";
+        //public const string RabbitMQConnectionUrl = "amqp://guest:guest@10.3.17.66:5671";
+        public const string RabbitMQConnectionUrl = "amqp://guest:guest@10.3.17.61:5672";
         public const string RabbitMQEventExchangeName = "event-exchange";
         public const string RabbitMQEventQueueName = "to-planning_event-queue";
         public const string RabbitMQUserExchangeName = "user-exchange";
