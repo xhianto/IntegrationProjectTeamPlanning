@@ -12,6 +12,7 @@ namespace RabbitMQUserConsumer
     class Program
     {
         private static Services OfficeService = new Services();
+        private static UserService userService = new UserService();
         //bearer token wordt niet refreshed, kan dus geen verbinding meer maken met api na 1 uur
         //private static Token BearerToken = OfficeService.RefreshAccesToken();
         static void Main(string[] args)
@@ -77,13 +78,13 @@ namespace RabbitMQUserConsumer
                         switch (result.Header.Method)
                         {
                             case XMLMethod.CREATE:
-                                OfficeService.UserCreate(result);
+                                userService.UserCreate(result);
                                 break;
                             case XMLMethod.UPDATE:
-                                OfficeService.UserUpdate(result);
+                                userService.UserUpdate(result);
                                 break;
                             case XMLMethod.DELETE:
-                                OfficeService.UserDelete(result);
+                                userService.UserDelete(result);
                                 break;
                         }
                     }
