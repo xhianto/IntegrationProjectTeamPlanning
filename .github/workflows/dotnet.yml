@@ -33,7 +33,8 @@ jobs:
       run: dotnet build --no-restore
     - name: Test
       run: dotnet test --no-build --verbosity normal
-    - name: run finalproduct
-      run: C:\actions-runner\_work\Planning\Planning\RabbitMQFinalProduct\bin\Debug\netcoreapp3.1\RabbitMQFinalProduct.exe
-      shell: powershell -command "& '{0}'"
-
+#    - name: run finalproduct
+#      run: C:\actions-runner\_work\Planning\Planning\RabbitMQFinalProduct\bin\Debug\netcoreapp3.1\RabbitMQFinalProduct.exe
+#      shell: powershell -command "& '{0}'"
+    - name: Dotnet Publish
+      run: dotnet publish src -c Release -o deploy
