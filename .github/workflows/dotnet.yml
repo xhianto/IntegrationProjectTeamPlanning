@@ -33,11 +33,5 @@ jobs:
       run: dotnet build --no-restore
     - name: Test
       run: dotnet test --no-build --verbosity normal
-      
-  start_application:
-    
-    runs-on: self-hosted
-      
-    steps:
     - name: run finalproduct
       run: C:\actions-runner\_work\Planning\Planning\RabbitMQFinalProduct\bin\Debug\netcoreapp3.1\RabbitMQFinalProduct.exe
