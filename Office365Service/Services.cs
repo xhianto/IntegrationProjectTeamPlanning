@@ -48,6 +48,7 @@ namespace Office365Service
                     {
                         BearerToken = JsonConvert.DeserializeObject<Token>(response.Content);
                         BearerToken.TimeStamp = DateTime.Now;
+                        Console.WriteLine(BearerToken.Token_type);
                         Console.WriteLine(response.Content);
                     }
                 }
@@ -221,7 +222,7 @@ namespace Office365Service
         /// </summary>
         /// <param name="calendarEvent">a calendar event with attributes of MS Graph API</param>
         /// <returns>one large '&'-seprated string ('street&nr&bus&')</returns>
-        private static string ConcatStreetNrAndBus(CalendarEvent calendarEvent)
+        public static string ConcatStreetNrAndBus(CalendarEvent calendarEvent)
         {
             string straat = "";
             string[] hulp = calendarEvent.Location.Address.Street.Split(' ');
