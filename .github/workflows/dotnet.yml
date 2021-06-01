@@ -7,11 +7,21 @@ on:
     branches: [ main ]
 
 jobs:
+#  kill_application:
+  
+#    runs-on: self-hosted
+    
+#    steps:
+    
+#    - name: kill application
+#      run: taskkill /IM RabbitMQFinalProduct.exe /F
+      
   build:
 
     runs-on: self-hosted
 
     steps:
+    
     - uses: actions/checkout@v2
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
@@ -21,5 +31,7 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
+#    - name: Test
+#      run: dotnet test --no-build --verbosity normal
+#    - name: run finalproduct
+#      run: C:\actions-runner\_work\Planning\Planning\RabbitMQFinalProduct\bin\Debug\netcoreapp3.1\RabbitMQFinalProduct.exe
