@@ -19,7 +19,7 @@ namespace RabbitMQConsumer
     {
         /* --- Instatiate the Services --- */
         private static Services OfficeService = new Services();
-
+        private static EventService eventService = new EventService();
 
         /// <summary>
         /// Main method for consuming MS Graph API calendar events from the RabbitMQ Message Broker
@@ -92,13 +92,13 @@ namespace RabbitMQConsumer
                         switch (result.Header.Method)
                         {
                             case XMLMethod.CREATE:
-                                OfficeService.EventCreate(result);
+                                eventService.EventCreate(result);
                                 break;
                             case XMLMethod.UPDATE:
-                                OfficeService.EventUpdate(result);
+                                eventService.EventUpdate(result);
                                 break;
                             case XMLMethod.DELETE:
-                                OfficeService.EventDelete(result);
+                                eventService.EventDelete(result);
                                 break;
                         }
                     }

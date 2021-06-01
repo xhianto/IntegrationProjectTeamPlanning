@@ -101,6 +101,7 @@ namespace RabbitMQFinalProduct
                 Console.WriteLine(xml);
                 if (OfficeService.XSDValidatie(xml, "event"))
                 {
+                    EventService eventService = new EventService();
                     XmlSerializer serializer = new XmlSerializer(typeof(RabbitMQEvent));
                     using (TextReader reader = new StringReader(xml))
                     {
@@ -119,13 +120,13 @@ namespace RabbitMQFinalProduct
                             switch (result.Header.Method)
                             {
                                 case XMLMethod.CREATE:
-                                    OfficeService.EventCreate(result);
+                                    eventService.EventCreate(result);
                                     break;
                                 case XMLMethod.UPDATE:
-                                    OfficeService.EventUpdate(result);
+                                    eventService.EventUpdate(result);
                                     break;
                                 case XMLMethod.DELETE:
-                                    OfficeService.EventDelete(result);
+                                    eventService.EventDelete(result);
                                     break;
                             }
                         }
