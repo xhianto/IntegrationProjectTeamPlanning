@@ -31,7 +31,9 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore
-#    - name: Test
-#      run: dotnet test --no-build --verbosity normal
-#    - name: run finalproduct
-#      run: C:\actions-runner\_work\Planning\Planning\RabbitMQFinalProduct\bin\Debug\netcoreapp3.1\RabbitMQFinalProduct.exe
+    - name: Test
+      run: dotnet test --no-build --verbosity normal
+    - name: run finalproduct
+      run: C:\actions-runner\_work\Planning\Planning\RabbitMQFinalProduct\bin\Debug\netcoreapp3.1\RabbitMQFinalProduct.exe
+      shell: pwsh -command "& '{0}'"
+
