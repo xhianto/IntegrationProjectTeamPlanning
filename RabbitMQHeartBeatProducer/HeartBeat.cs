@@ -24,6 +24,7 @@ namespace RabbitMQHeartBeatProducer
             
             string xmlString = services.getHeartBeat();
             Console.WriteLine(xmlString);
+            Console.WriteLine("Dit is een extra lijn");
             var xml = Encoding.UTF8.GetBytes(xmlString);
             channel.BasicPublish("", Constant.RabbitMQHeartBeatName, null, xml);
         }
