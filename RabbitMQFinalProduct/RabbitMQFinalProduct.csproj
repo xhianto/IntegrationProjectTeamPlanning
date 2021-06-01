@@ -10,6 +10,10 @@
     <None Include="bin\Debug\netcoreapp3.1\XMLvalidations\event.xsd" />
     <None Include="bin\Debug\netcoreapp3.1\XMLvalidations\heartbeat.xsd" />
     <None Include="bin\Debug\netcoreapp3.1\XMLvalidations\user.xsd" />
+    <None Include="obj\Release\netcoreapp3.1\XMLvalidations\attendance.xsd" />
+    <None Include="obj\Release\netcoreapp3.1\XMLvalidations\event.xsd" />
+    <None Include="obj\Release\netcoreapp3.1\XMLvalidations\heartbeat.xsd" />
+    <None Include="obj\Release\netcoreapp3.1\XMLvalidations\user.xsd" />
   </ItemGroup>
 
   <ItemGroup>
