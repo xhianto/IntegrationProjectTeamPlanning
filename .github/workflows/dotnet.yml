@@ -7,14 +7,14 @@ on:
     branches: [ main ]
 
 jobs:
-  kill_application:
+#  kill_application:
   
-    runs-on: self-hosted
+#    runs-on: self-hosted
     
-    steps:
+#    steps:
     
-    - name: kill application
-      run: taskkill /IM RabbitMQFinalProduct.exe /F
+#    - name: kill application
+#      run: taskkill /IM RabbitMQFinalProduct.exe /F
       
   build:
 
@@ -31,7 +31,7 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
-    - name: run finalproduct
-      run: C:\actions-runner\_work\Planning\Planning\RabbitMQFinalProduct\bin\Debug\netcoreapp3.1\RabbitMQFinalProduct.exe
+#    - name: Test
+#      run: dotnet test --no-build --verbosity normal
+#    - name: run finalproduct
+#      run: C:\actions-runner\_work\Planning\Planning\RabbitMQFinalProduct\bin\Debug\netcoreapp3.1\RabbitMQFinalProduct.exe
