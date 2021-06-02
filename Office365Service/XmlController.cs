@@ -41,5 +41,22 @@ namespace Office365Service
             StringReader reader = new StringReader(xml);
             return (T)serializer.Deserialize(reader);
         }
+
+        public bool XSDValidatie(string xml, string xsd) //geef xml string en welk xsd bestand je wilt gebruiken bvb "event.xsd"
+        {
+            XmlSchemaSet xmlSchema = new XmlSchemaSet();
+            xmlSchema.Add("", Environment.CurrentDirectory + "XMLvalidation/" + xsd + ".xsd");
+            bool xmlValidation = true;
+
+            XDocument doc = XDocument.Parse(xml);
+
+            doc.Validate(xmlSchema, (sender, args) =>
+            {
+                Console.WriteLine("Error Message: " + args.Message);
+                xmlValidation = false;
+            });
+            Console.WriteLine("XmlValidatie voor " + xsd + ": " + xmlValidation);
+            return xmlValidation;
+        }
     }
 }

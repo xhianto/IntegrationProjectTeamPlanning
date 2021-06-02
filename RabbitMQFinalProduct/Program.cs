@@ -23,6 +23,8 @@ namespace RabbitMQFinalProduct
             UserService userService = new UserService();
             EventService eventService = new EventService();
             AttendanceService attendanceService = new AttendanceService();
+            XmlController xmlController = new XmlController();
+
 
             /* --- Instatiate timer and trigger sendHeartbeat every second --- */
             HeartBeat heartBeat = new HeartBeat();
@@ -62,9 +64,8 @@ namespace RabbitMQFinalProduct
                 var message = e.Body.ToArray();
                 var xml = Encoding.UTF8.GetString(message);
                 Console.WriteLine(xml);
-                if (OfficeService.XSDValidatie(xml, "user"))
+                if (xmlController.XSDValidatie(xml, "user"))
                 {
-                    XmlController xmlController = new XmlController();
                     RabbitMQUser result = xmlController.ConvertXMLtoObject<RabbitMQUser>(xml);
                     Console.WriteLine(result.Header.Method);
                     Console.WriteLine(result.Header.Source);
@@ -99,9 +100,8 @@ namespace RabbitMQFinalProduct
                 var message = e.Body.ToArray();
                 var xml = Encoding.UTF8.GetString(message);
                 Console.WriteLine(xml);
-                if (OfficeService.XSDValidatie(xml, "event"))
+                if (xmlController.XSDValidatie(xml, "event"))
                 {
-                    XmlController xmlController = new XmlController();
                     RabbitMQEvent result = xmlController.ConvertXMLtoObject<RabbitMQEvent>(xml);
                     Console.WriteLine(result.Header.Method);
                     Console.WriteLine(result.Header.Source);
@@ -138,13 +138,13 @@ namespace RabbitMQFinalProduct
                 var message = e.Body.ToArray();
                 var xml = Encoding.UTF8.GetString(message);
                 Console.WriteLine(xml);
-                if (OfficeService.XSDValidatie(xml, "attendance"))
+                if (xmlController.XSDValidatie(xml, "attendance"))
                 {
-                    XmlController xmlController = new XmlController();
                     RabbitMQAttendance result = xmlController.ConvertXMLtoObject<RabbitMQAttendance>(xml);
                     Console.WriteLine(result.Header.Method);
                     Console.WriteLine(result.UUID);
-                    Console.WriteLine(result.UserId);
+                    Console.WriteLine(result.CreatorId);
+                    Console.WriteLine(result.AttendeeId);
                     Console.WriteLine(result.EventId);
                     switch (result.Header.Method)
                     {

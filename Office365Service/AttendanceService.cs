@@ -25,8 +25,8 @@ namespace Office365Service
 
             CalendarAttendees attendees = new CalendarAttendees();
             CalendarAttendee attendee = new CalendarAttendee();
-            Master masterOrganiser = masterDBServices.GetGraphIdFromMUUID(rabbitMQAttendance.UUID);
-            Master masterUserId = masterDBServices.GetGraphIdFromMUUID(rabbitMQAttendance.UserId);
+            Master masterOrganiser = masterDBServices.GetGraphIdFromMUUID(rabbitMQAttendance.CreatorId);
+            Master masterUserId = masterDBServices.GetGraphIdFromMUUID(rabbitMQAttendance.AttendeeId);
             Master masterEventId = masterDBServices.GetGraphIdFromMUUID(rabbitMQAttendance.EventId);
             //graph attendees ophalen uit event in graph
             BearerToken = services.RefreshAccesToken();
@@ -51,6 +51,13 @@ namespace Office365Service
 
             Console.WriteLine(response.StatusCode);
 
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                //newid voor MasterDB = organiserId + userId + eerste 32 chars van eventId + laatste 32 chars van eventId
+                string newId = masterOrganiser.SourceEntityId + "%" + masterUserId.SourceEntityId + "%" + masterEventId.SourceEntityId.Substring(0, 32) + "%" + masterEventId.SourceEntityId.Substring(masterEventId.SourceEntityId.Length - 32, 32);
+                masterDBServices.CreateEntity(rabbitMQAttendance.UUID, newId, "Attendance");
+                //masterDBService.ChangeEntityVersion(rabbitMQUser.UUID);
+            }
         }
 
 
@@ -66,7 +73,7 @@ namespace Office365Service
 
             CalendarAttendees attendees = new CalendarAttendees();
             Master masterOrganiser = masterDBServices.GetGraphIdFromMUUID(rabbitMQAttendance.UUID);
-            Master masterUserId = masterDBServices.GetGraphIdFromMUUID(rabbitMQAttendance.UserId);
+            Master masterUserId = masterDBServices.GetGraphIdFromMUUID(rabbitMQAttendance.AttendeeId);
             Master masterEventId = masterDBServices.GetGraphIdFromMUUID(rabbitMQAttendance.EventId);
             //graph attendees ophalen uit event in graph
             BearerToken = services.RefreshAccesToken();

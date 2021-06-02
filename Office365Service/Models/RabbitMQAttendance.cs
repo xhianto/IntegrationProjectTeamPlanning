@@ -20,8 +20,10 @@ namespace Office365Service.Models
         public RabbitMQAttendanceHeader Header { get; set; }
         [XmlElement("uuid")]
         public Guid UUID { get; set; }
-        [XmlElement("userId")]
-        public Guid UserId { get; set; }
+        [XmlElement("creatorId")]
+        public Guid CreatorId { get; set; }
+        [XmlElement("attendeeId")]
+        public Guid AttendeeId { get; set; }
         [XmlElement("eventId")]
         public Guid EventId { get; set; }
     }
