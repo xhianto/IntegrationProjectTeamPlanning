@@ -22,17 +22,17 @@ jobs:
 
     steps:
     
-    - uses: actions/checkout@v2
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 3.1.x
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build --no-restore
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
+#    - uses: actions/checkout@v2
+#    - name: Setup .NET
+#      uses: actions/setup-dotnet@v1
+#      with:
+#        dotnet-version: 3.1.x
+#    - name: Restore dependencies
+#      run: dotnet restore
+#    - name: Build
+#      run: dotnet build --no-restore
+#    - name: Test
+#      run: dotnet test --no-build --verbosity normal
 #    - name: run finalproduct
 #      run: C:\actions-runner\_work\Planning\Planning\RabbitMQFinalProduct\bin\Debug\netcoreapp3.1\RabbitMQFinalProduct.exe
 #      shell: powershell -command "& '{0}'"
@@ -57,12 +57,10 @@ jobs:
       run: Install-Module -Name Posh-SSH -Force
     - name: Add info to posh-ssh
       run: |
-        $Password = ${{ secrets.SSH_PASSWORD }}
-        $User = ${{ secrets.SSH_USER }}
-        $ComputerName = ${{ secrets.SSH_CONNECTION }}
-        $secpasswd = ConvertTo-SecureString $Password -AsPlainText -Force
-        $Credentials = New-Object System.Management.Automation.PSCredential($User, $secpasswd)
+        '$ComputerName' = ${{ secrets.SSH_CONNECTION }}
+        '$secpasswd' = ConvertTo-SecureString ${{ secrets.SSH_PASSWORD }} -AsPlainText -Force
+        '$Credentials' = New-Object System.Management.Automation.PSCredential(${{ secrets.SSH_USER }}, '$secpasswd')
 
-        $SessionID = New-SSHSession -ComputerName $ComputerName -Credential $Credentials #Connect Over SSH
+        '$SessionID' = New-SSHSession -ComputerName '$ComputerName' -Credential '$Credentials' #Connect Over SSH
     - name: Try a command
-      run: Invoke-SSHCommand -Index $sessionid.sessionid -Command "echo hello world" # Invoke Command Over SSH
+      run: Invoke-SSHCommand -Index '$sessionid.sessionid' -Command "echo hello world" # Invoke Command Over SSH
