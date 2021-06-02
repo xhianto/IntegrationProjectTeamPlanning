@@ -59,7 +59,7 @@ jobs:
       run: |
         '$ComputerName' = ${{ secrets.SSH_CONNECTION }}
         '$secpasswd' = ConvertTo-SecureString ${{ secrets.SSH_PASSWORD }} -AsPlainText -Force
-        '$Credentials' = New-Object System.Management.Automation.PSCredential(${{ secrets.SSH_USER }}, '$secpasswd')
+        '$Credentials' = New-Object System.Management.Automation.PSCredential -ArgumentList ${{ secrets.SSH_USER }}, '$secpasswd'
 
         '$SessionID' = New-SSHSession -ComputerName '$ComputerName' -Credential '$Credentials' #Connect Over SSH
     - name: Try a command
