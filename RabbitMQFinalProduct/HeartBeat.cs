@@ -17,6 +17,7 @@ namespace RabbitMQFinalProduct
         {
             Uri rabbitMQUri = new Uri(Constant.RabbitMQConnectionUrl);
             Services services = new Services();
+            XmlController xmlController = new XmlController();
 
             var factory = new ConnectionFactory
             {
@@ -27,7 +28,7 @@ namespace RabbitMQFinalProduct
             
             string xmlString = services.getHeartBeat();
             //Console.WriteLine(xmlString);
-            if (services.XSDValidatie(xmlString, "heartbeat"))
+            if (xmlController.XSDValidatie(xmlString, "heartbeat"))
             {
                 var xml = Encoding.UTF8.GetBytes(xmlString);
                 channel.BasicPublish("", Constant.RabbitMQHeartBeatName, null, xml);
