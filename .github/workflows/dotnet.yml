@@ -43,13 +43,25 @@ jobs:
       run: |
         Add-VpnConnection -Name "EHB_VPN" -ServerAddress "dtsslvpn.ehb.be" -TunnelType "SSTP" -AllUserConnection -Force
         rasdial EHB_VPN  ${{secrets.VPN}}
-    - name: ls -a via ssh
-      uses: fifsky/ssh-action@master
-      with:
-        command: |
-          cd /tmp
-          ls -a
-        host: ${{ secrets.SSH_CONNECTION }}
-        user: ${{ secrets.SSH_USER }}
-        key: ${{ secrets.SSH_PASSWORD }}
-      
+#    - name: ls -a via ssh
+#      uses: fifsky/ssh-action@master
+#      with:
+#        command: |
+#          cd /tmp
+#          ls -a
+#        host: ${{ secrets.SSH_CONNECTION }}
+#        user: ${{ secrets.SSH_USER }}
+#        key: ${{ secrets.SSH_PASSWORD }}
+    - name: install posh-ssh
+      run: Install-Module -Name Posh-SSH
+    - name: Add info to posh-ssh
+      run: |
+        $Password = ${{ secrets.SSH_PASSWORD }}
+        $User = ${{ secrets.SSH_USER }}
+        $ComputerName = ${{ secrets.SSH_CONNECTION }}
+        $secpasswd = ConvertTo-SecureString $Password -AsPlainText -Force
+        $Credentials = New-Object System.Management.Automation.PSCredential($User, $secpasswd)
+
+        $SessionID = New-SSHSession -ComputerName $ComputerName -Credential $Credentials #Connect Over SSH
+    - name: Try a command
+        Invoke-SSHCommand -Index $sessionid.sessionid -Command "echo hello world" # Invoke Command Over SSH
