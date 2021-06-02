@@ -57,10 +57,9 @@ jobs:
       run: Install-Module -Name Posh-SSH -Force
     - name: Add info to posh-ssh
       run: |
-        $ComputerName = ${{ secrets.SSH_CONNECTION }}
         $secpasswd = ConvertTo-SecureString ${{ secrets.SSH_PASSWORD }} -AsPlainText -Force
         $Credentials = New-Object System.Management.Automation.PSCredential -ArgumentList ${{ secrets.SSH_USER }}, $secpasswd
 
-        $SessionID = New-SSHSession -ComputerName $ComputerName -Credential $Credentials #Connect Over SSH
+        $SessionID = New-SSHSession -ComputerName ${{ secrets.SSH_CONNECTION }} -Credential $Credentials #Connect Over SSH
     - name: Try a command
       run: Invoke-SSHCommand -Index $sessionid.sessionid -Command "echo hello world" # Invoke Command Over SSH
