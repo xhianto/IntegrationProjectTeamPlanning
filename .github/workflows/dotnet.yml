@@ -39,6 +39,7 @@ jobs:
 #    - name: Dotnet Publish
 #      run: dotnet publish src -c Release -o deploy
     - name: add vpn connection
-      run: Add-VpnConnection -Name "EHB_VPN" -ServerAddress "dtsslvpn.ehb.be" -TunnelType "SSTP" -AllUserConnection -Force
-    - name: connect to vpn
-      run: rasdial EHB_VPN  ${{secrets.VPN}}
+      shell: pwsh
+      run: |
+        Add-VpnConnection -Name "EHB_VPN" -ServerAddress "dtsslvpn.ehb.be" -TunnelType "SSTP" -AllUserConnection -Force
+        rasdial EHB_VPN  ${{secrets.VPN}}
