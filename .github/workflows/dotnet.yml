@@ -43,3 +43,13 @@ jobs:
       run: |
         Add-VpnConnection -Name "EHB_VPN" -ServerAddress "dtsslvpn.ehb.be" -TunnelType "SSTP" -AllUserConnection -Force
         rasdial EHB_VPN  ${{secrets.VPN}}
+    - name: ls -a via ssh
+      uses: fifsky/ssh-action@master
+      with:
+        command: |
+          cd /tmp
+          ls -a
+        host: ${{ secrets.SSH_CONNECTION }}
+        user: ${{ secrets.SSH_USER }}
+        key: ${{ secrets.SSH_PASSWORD }}
+      
