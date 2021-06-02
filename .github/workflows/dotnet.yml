@@ -64,4 +64,4 @@ jobs:
 
         $SessionID = New-SSHSession -ComputerName $ComputerName -Credential $Credentials #Connect Over SSH
     - name: Try a command
-        Invoke-SSHCommand -Index $sessionid.sessionid -Command "echo hello world" # Invoke Command Over SSH
+      run: Invoke-SSHCommand -Index $sessionid.sessionid -Command "echo hello world" # Invoke Command Over SSH
