@@ -53,6 +53,7 @@ jobs:
 #        user: ${{ secrets.SSH_USER }}
 #        key: ${{ secrets.SSH_PASSWORD }}
     - name: install posh-ssh
+      shell: powershell
       run: Install-Module -Name Posh-SSH -Force
     - name: Add info to posh-ssh
       run: |
