@@ -53,7 +53,7 @@ jobs:
 #        user: ${{ secrets.SSH_USER }}
 #        key: ${{ secrets.SSH_PASSWORD }}
     - name: install posh-ssh
-      run: Install-Module -Name Posh-SSH
+      run: Install-Module -Name Posh-SSH -Force
     - name: Add info to posh-ssh
       run: |
         $Password = ${{ secrets.SSH_PASSWORD }}
