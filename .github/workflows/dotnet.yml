@@ -40,20 +40,20 @@ jobs:
     - name: install posh-ssh
       shell: powershell
       run: Install-Module -Name Posh-SSH -Force
-    - name: Add info to posh-ssh
+    - name: Publish on VM
       shell: powershell
       run: |
         $secpasswd = ConvertTo-SecureString ${{ secrets.SSH_PASSWORD }} -AsPlainText -Force
         $Credentials = New-Object System.Management.Automation.PSCredential -ArgumentList ${{ secrets.SSH_USER }}, $secpasswd
         $SessionID = New-SSHSession -ComputerName ${{ secrets.SSH_CONNECTION }} -Credential $Credentials -AcceptKey:$true
         Invoke-SSHCommand -Index $SessionID.sessionid -Command "dotnet publish C:\actions-runner\_work\Planning\Planning\RabbitMQFinalProduct\rabbitmqfinalproduct.csproj -o c:\FinalProduct"
-#    - name: Clonen met Git
-#      shell: powershell
-#      run: |
-#        $secpasswd = ConvertTo-SecureString ${{ secrets.SSH_PASSWORD }} -AsPlainText -Force
-#        $Credentials = New-Object System.Management.Automation.PSCredential -ArgumentList ${{ secrets.SSH_USER }}, $secpasswd
-#        $SessionID = New-SSHSession -ComputerName ${{ secrets.SSH_CONNECTION }} -Credential $Credentials -AcceptKey:$true
-#        Invoke-SSHCommand -Index $SessionID.sessionid -Command "git clone https://github.com/EHB-Integration-Project-Team-3/Planning.git"
+    - name: Clonen met Git
+      shell: powershell
+      run: |
+        $secpasswd = ConvertTo-SecureString ${{ secrets.SSH_PASSWORD }} -AsPlainText -Force
+        $Credentials = New-Object System.Management.Automation.PSCredential -ArgumentList ${{ secrets.SSH_USER }}, $secpasswd
+        $SessionID = New-SSHSession -ComputerName ${{ secrets.SSH_CONNECTION }} -Credential $Credentials -AcceptKey:$true
+        Invoke-SSHCommand -Index $SessionID.sessionid -Command "cp C:\actions-runner\_work\Planning\Planning\Office365Service\XMLvalidations c:\FinalProduct\ -Recurse"
 #    - name: Build project
 #      shell: powershell
 #      run: |
