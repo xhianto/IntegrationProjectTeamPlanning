@@ -52,15 +52,23 @@ jobs:
 #        host: ${{ secrets.SSH_CONNECTION }}
 #        user: ${{ secrets.SSH_USER }}
 #        key: ${{ secrets.SSH_PASSWORD }}
-    - name: install posh-ssh
-      shell: powershell
-      run: Install-Module -Name Posh-SSH -Force
-    - name: Add info to posh-ssh
-      shell: powershell
-      run: |
-        $secpasswd = ConvertTo-SecureString ${{ secrets.SSH_PASSWORD }} -AsPlainText -Force
-        $Credentials = New-Object System.Management.Automation.PSCredential -ArgumentList ${{ secrets.SSH_USER }}, $secpasswd
+#    - name: install posh-ssh
+#      shell: powershell
+#      run: Install-Module -Name Posh-SSH -Force
+#    - name: Add info to posh-ssh
+#      shell: powershell
+#      run: |
+#        $secpasswd = ConvertTo-SecureString ${{ secrets.SSH_PASSWORD }} -AsPlainText -Force
+#        $Credentials = New-Object System.Management.Automation.PSCredential -ArgumentList ${{ secrets.SSH_USER }}, $secpasswd
 
-        $SessionID = New-SSHSession -ComputerName ${{ secrets.SSH_CONNECTION }} -Credential $Credentials -AcceptKey:$true
-    - name: Try a command
-      run: Invoke-SSHCommand -Index $sessionid.sessionid -Command "echo hello world" # Invoke Command Over SSH
+#        $SessionID = New-SSHSession -ComputerName ${{ secrets.SSH_CONNECTION }} -Credential $Credentials -AcceptKey:$true
+#    - name: Try a command
+#      run: Invoke-SSHCommand -Index $sessionid.sessionid -Command "echo hello world" # Invoke Command Over SSH
+    - name: Run Commands via SSH To Start/Stop
+      uses: Flaavius/ssh-commands@1.0
+      with:
+        command: sh service.sh
+        host: ${{ secrests.SSH_CONNECTION }}
+        username: ${{ secrets.SSH_USER }}
+        password: ${{ secrets.SSH_PASSWORD }}
+        tryKeyboard: true
