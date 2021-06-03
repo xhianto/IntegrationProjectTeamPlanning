@@ -64,10 +64,10 @@ jobs:
 #        $SessionID = New-SSHSession -ComputerName ${{ secrets.SSH_CONNECTION }} -Credential $Credentials -AcceptKey:$true
 #    - name: Try a command
 #      run: Invoke-SSHCommand -Index $sessionid.sessionid -Command "echo hello world" # Invoke Command Over SSH
-    - name: Run Commands via SSH To Start/Stop
+    - name: ssh
       uses: Flaavius/ssh-commands@1.0
       with:
-        command: sh service.sh
+        command: echo hello world
         host: ${{ secrets.SSH_CONNECTION }}
         username: ${{ secrets.SSH_USER }}
         password: ${{ secrets.SSH_PASSWORD }}
