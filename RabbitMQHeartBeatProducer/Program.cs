@@ -31,33 +31,33 @@ namespace RabbitMQHeartBeatProducer
 
             using(var context = new MasterDbContext())
             {
-                frontend = context.Master.Find(78);
-                planning = context.Master.Find(80);
-                planning2 = context.Master.Find(136);
+                frontend = context.Master.Find(188);
+                planning = context.Master.Find(190);
+                planning2 = context.Master.Find(192);
             }
 
             Guid front = new Guid(frontend.Uuid);
             Guid plan = new Guid(planning.Uuid);
             Guid plan2 = new Guid(planning2.Uuid);
-            Guid plan3 = new Guid("f51aa4ea-dfc3-eb11-b876-00155d110504");
-            byte[] array = plan3.ToByteArray();
-            foreach (byte b in array)
-            {
-                Console.Write(b + ", ");
-            }
+            //Guid plan3 = new Guid("f51aa4ea-dfc3-eb11-b876-00155d110504");
+            //byte[] array = plan3.ToByteArray();
+            //foreach (byte b in array)
+            //{
+            //    Console.Write(b + ", ");
+            //}
+            //Console.WriteLine();
+            //byte[] mysql = service.MySQLByteArray(plan3);
+            //foreach (byte b in mysql)
+            //{
+            //    Console.Write(b + ", ");
+            //}
             Console.WriteLine();
-            byte[] mysql = service.MySQLByteArray(plan3);
-            foreach (byte b in mysql)
-            {
-                Console.Write(b + ", ");
-            }
-            Console.WriteLine();
-            Console.WriteLine("Frontend: " + front.ToString());
-            Console.WriteLine("Planning: " + plan.ToString());
-            Console.WriteLine("Planning2: " + plan2.ToString());
-            Console.WriteLine("uuid is           f51aa4ea-dfc3-eb11-b876-00155d110504");
-            Console.WriteLine("ToByteArray():    " + new Guid(array).ToString());
-            Console.WriteLine("MySQLByteArray(): " + new Guid(mysql).ToString());
+            Console.WriteLine("Canvas: " + front.ToString());
+            Console.WriteLine("Frontend: " + plan.ToString());
+            Console.WriteLine("Planning: " + plan2.ToString());
+            //Console.WriteLine("uuid is           f51aa4ea-dfc3-eb11-b876-00155d110504");
+            //Console.WriteLine("ToByteArray():    " + new Guid(array).ToString());
+            //Console.WriteLine("MySQLByteArray(): " + new Guid(mysql).ToString());
         }
     }
 }

@@ -6,19 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="bin\Debug\netcoreapp3.1\XMLvalidations\attendance.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="bin\Debug\netcoreapp3.1\XMLvalidations\event.xsd" />
-    <None Include="bin\Debug\netcoreapp3.1\XMLvalidations\heartbeat.xsd" />
-    <None Include="bin\Debug\netcoreapp3.1\XMLvalidations\user.xsd" />
-    <None Include="obj\Release\netcoreapp3.1\XMLvalidations\attendance.xsd" />
-    <None Include="obj\Release\netcoreapp3.1\XMLvalidations\event.xsd" />
-    <None Include="obj\Release\netcoreapp3.1\XMLvalidations\heartbeat.xsd" />
-    <None Include="obj\Release\netcoreapp3.1\XMLvalidations\user.xsd" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.15">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -33,6 +20,21 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Office365Service\Office365Service.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="XMLvalidations\attendance.xsd">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="XMLvalidations\event.xsd">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="XMLvalidations\heartbeat.xsd">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="XMLvalidations\user.xsd">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

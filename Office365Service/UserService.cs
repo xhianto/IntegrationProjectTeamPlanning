@@ -102,6 +102,7 @@ namespace Office365Service
                 user.DisplayName = rabbitMQUser.FirstName + " " + rabbitMQUser.LastName;
                 user.MailNickname = rabbitMQUser.FirstName.Replace(' ', '.') + "." + rabbitMQUser.LastName;
                 user.UserPrincipalName = user.MailNickname + "@ipwt3.onmicrosoft.com";
+                user.Mail = user.UserPrincipalName;
                 user.UsageLocation = "BE";
                 //user.PasswordProfile = new UserPasswordProfile();
                 //user.PasswordProfile.ForceChangePasswordNextSignIn = false;
