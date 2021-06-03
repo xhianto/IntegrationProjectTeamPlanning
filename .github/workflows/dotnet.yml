@@ -38,11 +38,11 @@ jobs:
 #      shell: powershell -command "& '{0}'"
 #    - name: Dotnet Publish
 #      run: dotnet publish src -c Release -o deploy
-#    - name: add vpn connection
-#      shell: pwsh
-#      run: |
-#        Add-VpnConnection -Name "EHB_VPN" -ServerAddress "dtsslvpn.ehb.be" -TunnelType "SSTP" -AllUserConnection -Force
-#        rasdial EHB_VPN  ${{secrets.VPN}}
+    - name: add vpn connection
+      shell: pwsh
+      run: |
+        Add-VpnConnection -Name "EHB_VPN" -ServerAddress "dtsslvpn.ehb.be" -TunnelType "SSTP" -AllUserConnection -Force
+        rasdial EHB_VPN  ${{secrets.VPN}}
 #    - name: install posh-ssh
 #      shell: powershell
 #      run: Install-Module -Name Posh-SSH -Force
