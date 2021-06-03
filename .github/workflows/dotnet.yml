@@ -46,13 +46,13 @@ jobs:
     - name: install posh-ssh
       shell: powershell
       run: Install-Module -Name Posh-SSH -Force
-    - name: Add info to posh-ssh
-      shell: powershell
-      run: |
-        $secpasswd = ConvertTo-SecureString ${{ secrets.SSH_PASSWORD }} -AsPlainText -Force
-        $Credentials = New-Object System.Management.Automation.PSCredential -ArgumentList ${{ secrets.SSH_USER }}, $secpasswd
-        $SessionID = New-SSHSession -ComputerName ${{ secrets.SSH_CONNECTION }} -Credential $Credentials -AcceptKey:$true
-        Invoke-SSHCommand -Index $SessionID.sessionid -Command "cd\"
+#    - name: Add info to posh-ssh
+#      shell: powershell
+#      run: |
+#        $secpasswd = ConvertTo-SecureString ${{ secrets.SSH_PASSWORD }} -AsPlainText -Force
+#        $Credentials = New-Object System.Management.Automation.PSCredential -ArgumentList ${{ secrets.SSH_USER }}, $secpasswd
+#        $SessionID = New-SSHSession -ComputerName ${{ secrets.SSH_CONNECTION }} -Credential $Credentials -AcceptKey:$true
+#        Invoke-SSHCommand -Index $SessionID.sessionid -Command "cd\"
     - name: Clonen met Git
       shell: powershell
       run: |
