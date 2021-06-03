@@ -41,7 +41,7 @@ namespace Office365Service
                 ASCIIEncoding enc = new ASCIIEncoding();
                 Console.WriteLine(muuid.ToString());
                 Master master = new Master();
-                master.Uuid = muuid.ToByteArray();
+                master.Uuid = MySQLByteArray(muuid);
                 master.SourceEntityId = id;
                 master.EntityType = entityType.ToString();
                 master.EntityVersion = 1;
@@ -58,7 +58,7 @@ namespace Office365Service
             using(var db = new MasterDbContext())
             {
                 master = (from m in db.Master
-                 where m.Uuid == muuid.ToByteArray() && m.Source == XMLSource.PLANNING.ToString()
+                 where m.Uuid == MySQLByteArray(muuid) && m.Source == XMLSource.PLANNING.ToString()
                  select m).FirstOrDefault();
                 
                 Console.WriteLine(master.Id);
@@ -76,7 +76,7 @@ namespace Office365Service
             using(var db = new MasterDbContext())
             {
                 Master master = (from m in db.Master
-                                 where m.Uuid == muuid.ToByteArray() && m.Source == XMLSource.PLANNING.ToString()
+                                 where m.Uuid == MySQLByteArray(muuid) && m.Source == XMLSource.PLANNING.ToString()
                                  select m).FirstOrDefault();
                 master.EntityVersion++;
                 Console.WriteLine("Entity Version: " + master.EntityVersion);
@@ -90,15 +90,23 @@ namespace Office365Service
             using(var db = new MasterDbContext())
             {
                 Master masterSource = (from  m in db.Master
-                                       where m.Uuid == muuid.ToByteArray() && m.Source == source.ToString()
+                                       where m.Uuid == MySQLByteArray(muuid) && m.Source == source.ToString()
                                        select m).FirstOrDefault();
                 Master masterPlanning = (from m in db.Master
-                                         where m.Uuid == muuid.ToByteArray() && m.Source == XMLSource.PLANNING.ToString()
+                                         where m.Uuid == MySQLByteArray(muuid) && m.Source == XMLSource.PLANNING.ToString()
                                          select m).FirstOrDefault();
                 if (masterSource != null && masterPlanning != null)
                     result = masterSource.EntityVersion > masterPlanning.EntityVersion;
             }
             return result;
+        }
+
+        //Deze functie is nodig om Guid.ToByteArray gelijk te stellen met UUID_TO_BIN van MySQL
+        //Guid.ToByteArray flipt de eerste 3 groepen van een UUID op een of andere manier 
+        public byte[] MySQLByteArray(Guid guid)
+        {
+            byte[] c = guid.ToByteArray();
+            return new byte[] { c[3], c[2], c[1], c[0], c[5], c[4], c[7], c[6], c[8], c[9], c[10], c[11], c[12], c[13], c[14], c[15] };
         }
     }
 }

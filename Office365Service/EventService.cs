@@ -100,7 +100,7 @@ namespace Office365Service
             Master masterUserId = masterDBService.GetGraphIdFromMUUID(rabbitMQEvent.OrganiserId);
             Master masterEventId = masterDBService.GetGraphIdFromMUUID(rabbitMQEvent.UUID);
 
-            if (masterEventId != null && masterUserId != null && masterDBService.CheckSourceEntityVersionIsHigher(rabbitMQEvent.UUID, rabbitMQEvent.Header.Source))
+            if (masterEventId != null && masterUserId != null /*&& masterDBService.CheckSourceEntityVersionIsHigher(rabbitMQEvent.UUID, rabbitMQEvent.Header.Source)*/)
             {
                 RestClient restClient = new RestClient();
                 RestRequest restRequest = new RestRequest();

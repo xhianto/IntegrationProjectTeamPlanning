@@ -47,7 +47,7 @@ namespace Office365Service
         public bool XSDValidatie(string xml, string xsd) //geef xml string en welk xsd bestand je wilt gebruiken bvb "event.xsd"
         {
             XmlSchemaSet xmlSchema = new XmlSchemaSet();
-            xmlSchema.Add("", Environment.CurrentDirectory + "XMLvalidation/" + xsd + ".xsd");
+            xmlSchema.Add("", Environment.CurrentDirectory + "/XMLvalidations/" + xsd + ".xsd");
             bool xmlValidation = true;
 
             XDocument doc = XDocument.Parse(xml);
