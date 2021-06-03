@@ -70,7 +70,7 @@ jobs:
     - name: Run Commands via SSH To Start/Stop
       uses: Flaavius/ssh-commands@1.0
       with:
-        command: dotnet publish "C:\Planning\RabbitMQFinalProduct\rabbitmqfinalproduct.csproj" -o "c:\finalproduct"
+        command: dotnet publish "C:\actions-runner\_work\Planning\Planning\RabbitMQFinalProduct\rabbitmqfinalproduct.csproj" -o "c:\FinalProduct"
         host: ${{ secrets.SSH_CONNECTION }}
         username: ${{ secrets.SSH_USER }}
         password: ${{ secrets.SSH_PASSWORD }}
