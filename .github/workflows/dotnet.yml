@@ -53,13 +53,13 @@ jobs:
 #        $Credentials = New-Object System.Management.Automation.PSCredential -ArgumentList ${{ secrets.SSH_USER }}, $secpasswd
 #        $SessionID = New-SSHSession -ComputerName ${{ secrets.SSH_CONNECTION }} -Credential $Credentials -AcceptKey:$true
 #        Invoke-SSHCommand -Index $SessionID.sessionid -Command "git clone https://github.com/EHB-Integration-Project-Team-3/Planning.git"
-    - name: Clonen met Git
-      shell: powershell
-      run: |
-        $secpasswd = ConvertTo-SecureString ${{ secrets.SSH_PASSWORD }} -AsPlainText -Force
-        $Credentials = New-Object System.Management.Automation.PSCredential -ArgumentList ${{ secrets.SSH_USER }}, $secpasswd
-        $SessionID = New-SSHSession -ComputerName ${{ secrets.SSH_CONNECTION }} -Credential $Credentials -AcceptKey:$true
-        Invoke-SSHCommand -Index $SessionID.sessionid -Command "git clone https://github.com/EHB-Integration-Project-Team-3/Planning.git"
+#    - name: Clonen met Git
+#      shell: powershell
+#      run: |
+#        $secpasswd = ConvertTo-SecureString ${{ secrets.SSH_PASSWORD }} -AsPlainText -Force
+#        $Credentials = New-Object System.Management.Automation.PSCredential -ArgumentList ${{ secrets.SSH_USER }}, $secpasswd
+#        $SessionID = New-SSHSession -ComputerName ${{ secrets.SSH_CONNECTION }} -Credential $Credentials -AcceptKey:$true
+#        Invoke-SSHCommand -Index $SessionID.sessionid -Command "git clone https://github.com/EHB-Integration-Project-Team-3/Planning.git"
 #    - name: Build project
 #      shell: powershell
 #      run: |
@@ -67,12 +67,12 @@ jobs:
 #        $Credentials = New-Object System.Management.Automation.PSCredential -ArgumentList ${{ secrets.SSH_USER }}, $secpasswd
 #        $SessionID = New-SSHSession -ComputerName ${{ secrets.SSH_CONNECTION }} -Credential $Credentials -AcceptKey:$true
 #        Invoke-SSHCommand -Index $SessionID.sessionid -Command "dotnet c:\planning\rabbitmqfinalwork\rabbitmqfinalwork.csproj -o c:\FinalProduct"
-#    - name: Run Commands via SSH To Start/Stop
-#      uses: Flaavius/ssh-commands@1.0
-#      with:
-#        command: mkdir lalalala
-#        host: ${{ secrets.SSH_CONNECTION }}
-#        username: ${{ secrets.SSH_USER }}
-#        password: ${{ secrets.SSH_PASSWORD }}
-#        tryKeyboard: true
+    - name: Run Commands via SSH To Start/Stop
+      uses: Flaavius/ssh-commands@1.0
+      with:
+        command: "git clone https://github.com/EHB-Integration-Project-Team-3/Planning.git"
+        host: ${{ secrets.SSH_CONNECTION }}
+        username: ${{ secrets.SSH_USER }}
+        password: ${{ secrets.SSH_PASSWORD }}
+        tryKeyboard: true
 
