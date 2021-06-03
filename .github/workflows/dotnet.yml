@@ -38,28 +38,28 @@ jobs:
 #      shell: powershell -command "& '{0}'"
 #    - name: Dotnet Publish
 #      run: dotnet publish src -c Release -o deploy
-    - name: add vpn connection
-      shell: pwsh
-      run: |
-        Add-VpnConnection -Name "EHB_VPN" -ServerAddress "dtsslvpn.ehb.be" -TunnelType "SSTP" -AllUserConnection -Force
-        rasdial EHB_VPN  ${{secrets.VPN}}
-    - name: install posh-ssh
-      shell: powershell
-      run: Install-Module -Name Posh-SSH -Force
-    - name: Add info to posh-ssh
-      shell: powershell
-      run: |
-        $secpasswd = ConvertTo-SecureString ${{ secrets.SSH_PASSWORD }} -AsPlainText -Force
-        $Credentials = New-Object System.Management.Automation.PSCredential -ArgumentList ${{ secrets.SSH_USER }}, $secpasswd
-        $SessionID = New-SSHSession -ComputerName ${{ secrets.SSH_CONNECTION }} -Credential $Credentials -AcceptKey:$true
-        Invoke-SSHCommand -Index $SessionID.sessionid -Command "git clone https://github.com/EHB-Integration-Project-Team-3/Planning.git"
-#    - name: Clonen met Git
+#    - name: add vpn connection
+#      shell: pwsh
+#      run: |
+#        Add-VpnConnection -Name "EHB_VPN" -ServerAddress "dtsslvpn.ehb.be" -TunnelType "SSTP" -AllUserConnection -Force
+#        rasdial EHB_VPN  ${{secrets.VPN}}
+#    - name: install posh-ssh
+#      shell: powershell
+#      run: Install-Module -Name Posh-SSH -Force
+#    - name: Add info to posh-ssh
 #      shell: powershell
 #      run: |
 #        $secpasswd = ConvertTo-SecureString ${{ secrets.SSH_PASSWORD }} -AsPlainText -Force
 #        $Credentials = New-Object System.Management.Automation.PSCredential -ArgumentList ${{ secrets.SSH_USER }}, $secpasswd
 #        $SessionID = New-SSHSession -ComputerName ${{ secrets.SSH_CONNECTION }} -Credential $Credentials -AcceptKey:$true
 #        Invoke-SSHCommand -Index $SessionID.sessionid -Command "git clone https://github.com/EHB-Integration-Project-Team-3/Planning.git"
+    - name: Clonen met Git
+      shell: powershell
+      run: |
+        $secpasswd = ConvertTo-SecureString ${{ secrets.SSH_PASSWORD }} -AsPlainText -Force
+        $Credentials = New-Object System.Management.Automation.PSCredential -ArgumentList ${{ secrets.SSH_USER }}, $secpasswd
+        $SessionID = New-SSHSession -ComputerName ${{ secrets.SSH_CONNECTION }} -Credential $Credentials -AcceptKey:$true
+        Invoke-SSHCommand -Index $SessionID.sessionid -Command "git clone https://github.com/EHB-Integration-Project-Team-3/Planning.git"
 #    - name: Build project
 #      shell: powershell
 #      run: |
