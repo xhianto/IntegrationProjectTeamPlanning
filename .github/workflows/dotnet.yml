@@ -68,7 +68,7 @@ jobs:
       uses: Flaavius/ssh-commands@1.0
       with:
         command: sh service.sh
-        host: ${{ secrests.SSH_CONNECTION }}
+        host: ${{ secrets.SSH_CONNECTION }}
         username: ${{ secrets.SSH_USER }}
         password: ${{ secrets.SSH_PASSWORD }}
         tryKeyboard: true
