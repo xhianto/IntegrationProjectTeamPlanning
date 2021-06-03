@@ -9,7 +9,7 @@ on:
 jobs:
   build:
 
-    runs-on: self-hosted
+    runs-on: windows-latest
 
     steps:
     
@@ -24,14 +24,16 @@ jobs:
       run: dotnet build --no-restore
     - name: Test
       run: dotnet test --no-build --verbosity normal
+    - name: Publish
+      run: dotnet publish -o deploy
 #    - name: run finalproduct
 #      run: C:\actions-runner\_work\Planning\Planning\RabbitMQFinalProduct\bin\Debug\netcoreapp3.1\RabbitMQFinalProduct.exe
 #      shell: powershell -command "& '{0}'"
 
-  deploy:
-    runs-on: windows-latest
-    needs: build
-    steps:
+#  deploy:
+#    runs-on: windows-latest
+#    needs: build
+#    steps:
     - name: add vpn connection
       shell: pwsh
       run: |
@@ -40,33 +42,32 @@ jobs:
     - name: install posh-ssh
       shell: powershell
       run: Install-Module -Name Posh-SSH -Force
-    - name: Publish on VM
-      shell: powershell
-      run: |
-        $secpasswd = ConvertTo-SecureString ${{ secrets.SSH_PASSWORD }} -AsPlainText -Force
-        $Credentials = New-Object System.Management.Automation.PSCredential -ArgumentList ${{ secrets.SSH_USER }}, $secpasswd
-        $SessionID = New-SSHSession -ComputerName ${{ secrets.SSH_CONNECTION }} -Credential $Credentials -AcceptKey:$true
-        Invoke-SSHCommand -Index $SessionID.sessionid -Command "dotnet publish C:\actions-runner\_work\Planning\Planning\RabbitMQFinalProduct\rabbitmqfinalproduct.csproj -o c:\FinalProduct"
-    - name: Clonen met Git
-      shell: powershell
-      run: |
-        $secpasswd = ConvertTo-SecureString ${{ secrets.SSH_PASSWORD }} -AsPlainText -Force
-        $Credentials = New-Object System.Management.Automation.PSCredential -ArgumentList ${{ secrets.SSH_USER }}, $secpasswd
-        $SessionID = New-SSHSession -ComputerName ${{ secrets.SSH_CONNECTION }} -Credential $Credentials -AcceptKey:$true
-        Invoke-SSHCommand -Index $SessionID.sessionid -Command "start c:\finalproduct\rabbitmqfinalproduct.exe"
-#    - name: Build project
+#    - name: Publish on VM
 #      shell: powershell
 #      run: |
 #        $secpasswd = ConvertTo-SecureString ${{ secrets.SSH_PASSWORD }} -AsPlainText -Force
 #        $Credentials = New-Object System.Management.Automation.PSCredential -ArgumentList ${{ secrets.SSH_USER }}, $secpasswd
 #        $SessionID = New-SSHSession -ComputerName ${{ secrets.SSH_CONNECTION }} -Credential $Credentials -AcceptKey:$true
-#        Invoke-SSHCommand -Index $SessionID.sessionid -Command "dotnet c:\planning\rabbitmqfinalwork\rabbitmqfinalwork.csproj -o c:\FinalProduct"
+#        Invoke-SSHCommand -Index $SessionID.sessionid -Command "dotnet publish C:\actions-runner\_work\Planning\Planning\RabbitMQFinalProduct\rabbitmqfinalproduct.csproj -o c:\FinalProduct"
+#    - name: Clonen met Git
+#      shell: powershell
+#      run: |
+#        $secpasswd = ConvertTo-SecureString ${{ secrets.SSH_PASSWORD }} -AsPlainText -Force
+#        $Credentials = New-Object System.Management.Automation.PSCredential -ArgumentList ${{ secrets.SSH_USER }}, $secpasswd
+#        $SessionID = New-SSHSession -ComputerName ${{ secrets.SSH_CONNECTION }} -Credential $Credentials -AcceptKey:$true
+#        Invoke-SSHCommand -Index $SessionID.sessionid -Command "start c:\finalproduct\rabbitmqfinalproduct.exe"
+    - name: Build project
+      shell: powershell
+      run: |
+        $secpasswd = ConvertTo-SecureString ${{ secrets.SSH_PASSWORD }} -AsPlainText -Force
+        $Credentials = New-Object System.Management.Automation.PSCredential -ArgumentList ${{ secrets.SSH_USER }}, $secpasswd
+        Set-SCPFolder -ComputerName ${{ secrets.SSH_CONNECTION }} -Credential $credential -LocalFolder 'deploy' -RemoteFolder 'c:\Try\'
 #    - name: Run Commands via SSH To Start/Stop
 #      uses: Flaavius/ssh-commands@1.0
 #      with:
 #        command: dotnet publish "C:\actions-runner\_work\Planning\Planning\RabbitMQFinalProduct\rabbitmqfinalproduct.csproj" -o "c:\FinalProduct"
 #        host: ${{ secrets.SSH_CONNECTION }}
-#        username: ${{ secrets.SSH_USER }}
+#        username: ${{ secrets.SSHde_USER }}
 #        password: ${{ secrets.SSH_PASSWORD }}
 #        tryKeyboard: true
 
