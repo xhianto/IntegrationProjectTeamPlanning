@@ -61,7 +61,7 @@ jobs:
       run: |
         $secpasswd = ConvertTo-SecureString ${{ secrets.SSH_PASSWORD }} -AsPlainText -Force
         $Credentials = New-Object System.Management.Automation.PSCredential -ArgumentList ${{ secrets.SSH_USER }}, $secpasswd
-        Set-SCPFolder -ComputerName ${{ secrets.SSH_CONNECTION }} -Credential $credential -LocalFolder 'deploy' -RemoteFolder 'c:\Try\'
+        Set-SCPFolder -ComputerName ${{ secrets.SSH_CONNECTION }} -Credential $credential -LocalFolder 'D:\a\Planning\Planning\deploy\' -RemoteFolder 'c:\Try\'
 #    - name: Run Commands via SSH To Start/Stop
 #      uses: Flaavius/ssh-commands@1.0
 #      with:
