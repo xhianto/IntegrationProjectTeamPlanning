@@ -37,28 +37,46 @@ namespace Office365Service
             return xml;
         }
 
-        public T ConvertXMLtoObject<T>(string xml)
+        public T ConvertXMLtoObject<T>(string xml) where T : new()
         {
-            XmlSerializer serializer = new XmlSerializer(typeof(T));
-            StringReader reader = new StringReader(xml);
-            return (T)serializer.Deserialize(reader);
+            T ob = new T();
+            try
+            {
+                XmlSerializer serializer = new XmlSerializer(typeof(T));
+                StringReader reader = new StringReader(xml);
+                ob = (T)serializer.Deserialize(reader);
+                return ob;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return ob;
+            }
         }
 
         public bool XSDValidatie(string xml, string xsd) //geef xml string en welk xsd bestand je wilt gebruiken bvb "event.xsd"
         {
-            XmlSchemaSet xmlSchema = new XmlSchemaSet();
-            xmlSchema.Add("", Environment.CurrentDirectory + "/XMLvalidations/" + xsd + ".xsd");
             bool xmlValidation = true;
-
-            XDocument doc = XDocument.Parse(xml);
-
-            doc.Validate(xmlSchema, (sender, args) =>
+            try
             {
-                Console.WriteLine("Error Message: " + args.Message);
-                xmlValidation = false;
-            });
-            Console.WriteLine("XmlValidatie voor " + xsd + ": " + xmlValidation);
-            return xmlValidation;
+                XmlSchemaSet xmlSchema = new XmlSchemaSet();
+                xmlSchema.Add("", Environment.CurrentDirectory + "/XMLvalidations/" + xsd + ".xsd");
+
+                XDocument doc = XDocument.Parse(xml);
+
+                doc.Validate(xmlSchema, (sender, args) =>
+                {
+                    Console.WriteLine("Error Message: " + args.Message);
+                    xmlValidation = false;
+                });
+                Console.WriteLine("XmlValidatie voor " + xsd + ": " + xmlValidation);
+                return xmlValidation;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
         }
     }
 }

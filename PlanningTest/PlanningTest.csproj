@@ -17,4 +17,19 @@
     <ProjectReference Include="..\Office365Service\Office365Service.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="XMLvalidations\attendance.xsd">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="XMLvalidations\event.xsd">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="XMLvalidations\heartbeat.xsd">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="XMLvalidations\user.xsd">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

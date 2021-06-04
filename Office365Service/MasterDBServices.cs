@@ -55,20 +55,28 @@ namespace Office365Service
         public Master GetGraphIdFromMUUID(Guid muuid)
         {
             Master master = new Master();
-            using(var db = new MasterDbContext())
+            try
             {
-                master = (from m in db.Master
-                 where m.Uuid == MySQLByteArray(muuid) && m.Source == XMLSource.PLANNING.ToString()
-                 select m).FirstOrDefault();
+                using(var db = new MasterDbContext())
+                {
+                    master = (from m in db.Master
+                     where m.Uuid == MySQLByteArray(muuid) && m.Source == XMLSource.PLANNING.ToString()
+                     select m).FirstOrDefault();
                 
-                Console.WriteLine(master.Id);
-                Console.WriteLine(new Guid(master.Uuid).ToString());
-                Console.WriteLine(master.SourceEntityId);
-                Console.WriteLine(master.EntityType);
-                Console.WriteLine(master.EntityVersion);
-                Console.WriteLine(master.Source);
+                     Console.WriteLine(master.Id);
+                    Console.WriteLine(new Guid(master.Uuid).ToString());
+                    Console.WriteLine(master.SourceEntityId);
+                    Console.WriteLine(master.EntityType);
+                    Console.WriteLine(master.EntityVersion);
+                    Console.WriteLine(master.Source);
+                    return master;
+                }
             }
-            return master;
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return master;
+            }
         }
 
         public void ChangeEntityVersion(Guid muuid)
