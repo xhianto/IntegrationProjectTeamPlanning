@@ -33,8 +33,7 @@ jobs:
         rasdial EHB_VPN  ${{secrets.VPN}}
     - name: install posh-ssh
       shell: powershell
-      run: Install-Module -Name Posh-SSH -Force
-    # We kunnen direct een publish uitvoeren op de VM omdat we een action-runner van github hebben draaien op de VM, zo zijn de bestanden altijd up-to-date na elke push naar main branch  
+      run: Install-Module -Name Posh-SSH -Force 
     - name: Publish on VM
       shell: powershell
       run: |
