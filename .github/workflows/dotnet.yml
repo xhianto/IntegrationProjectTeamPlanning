@@ -1,4 +1,4 @@
-name: .NET
+name: Github Actions
 
 on:
   push:
@@ -8,11 +8,8 @@ on:
 
 jobs:
   build:
-
     runs-on: self-hosted
-
     steps:
-    
     - uses: actions/checkout@v2
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
@@ -24,9 +21,6 @@ jobs:
       run: dotnet build --no-restore
     - name: Test
       run: dotnet test --no-build --verbosity normal
-#    - name: run finalproduct
-#      run: C:\actions-runner\_work\Planning\Planning\RabbitMQFinalProduct\bin\Debug\netcoreapp3.1\RabbitMQFinalProduct.exe
-#      shell: powershell -command "& '{0}'"
 
   deploy:
     runs-on: windows-latest
@@ -39,7 +33,7 @@ jobs:
         rasdial EHB_VPN  ${{secrets.VPN}}
     - name: install posh-ssh
       shell: powershell
-      run: Install-Module -Name Posh-SSH -Force
+      run: Install-Module -Name Posh-SSH -Force 
     - name: Publish on VM
       shell: powershell
       run: |
@@ -47,26 +41,3 @@ jobs:
         $Credentials = New-Object System.Management.Automation.PSCredential -ArgumentList ${{ secrets.SSH_USER }}, $secpasswd
         $SessionID = New-SSHSession -ComputerName ${{ secrets.SSH_CONNECTION }} -Credential $Credentials -AcceptKey:$true
         Invoke-SSHCommand -Index $SessionID.sessionid -Command "dotnet publish C:\actions-runner\_work\Planning\Planning\RabbitMQFinalProduct\rabbitmqfinalproduct.csproj -o c:\FinalProduct"
-    - name: Clonen met Git
-      shell: powershell
-      run: |
-        $secpasswd = ConvertTo-SecureString ${{ secrets.SSH_PASSWORD }} -AsPlainText -Force
-        $Credentials = New-Object System.Management.Automation.PSCredential -ArgumentList ${{ secrets.SSH_USER }}, $secpasswd
-        $SessionID = New-SSHSession -ComputerName ${{ secrets.SSH_CONNECTION }} -Credential $Credentials -AcceptKey:$true
-        Invoke-SSHCommand -Index $SessionID.sessionid -Command "cp C:\actions-runner\_work\Planning\Planning\Office365Service\XMLvalidations c:\FinalProduct\ -Recurse"
-#    - name: Build project
-#      shell: powershell
-#      run: |
-#        $secpasswd = ConvertTo-SecureString ${{ secrets.SSH_PASSWORD }} -AsPlainText -Force
-#        $Credentials = New-Object System.Management.Automation.PSCredential -ArgumentList ${{ secrets.SSH_USER }}, $secpasswd
-#        $SessionID = New-SSHSession -ComputerName ${{ secrets.SSH_CONNECTION }} -Credential $Credentials -AcceptKey:$true
-#        Invoke-SSHCommand -Index $SessionID.sessionid -Command "dotnet c:\planning\rabbitmqfinalwork\rabbitmqfinalwork.csproj -o c:\FinalProduct"
-#    - name: Run Commands via SSH To Start/Stop
-#      uses: Flaavius/ssh-commands@1.0
-#      with:
-#        command: dotnet publish "C:\actions-runner\_work\Planning\Planning\RabbitMQFinalProduct\rabbitmqfinalproduct.csproj" -o "c:\FinalProduct"
-#        host: ${{ secrets.SSH_CONNECTION }}
-#        username: ${{ secrets.SSH_USER }}
-#        password: ${{ secrets.SSH_PASSWORD }}
-#        tryKeyboard: true
-
